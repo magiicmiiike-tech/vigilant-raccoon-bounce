@@ -3,8 +3,8 @@ erDiagram
     tenants ||--o{ api_keys : issues
     tenants ||--|| tenant_configs : configures
     tenants ||--o{ webhooks : manages
-    tenants ||--o{ feature_flags : defines
-    tenants ||--o{ usage_quotas : sets
+    tenants ||--o{ feature_flags : enables
+    tenants ||--o{ usage_quotas : defines
     
     users ||--o{ sessions : has
     users }|--|| roles : assigned
