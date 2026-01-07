@@ -27,11 +27,10 @@ import {
 import {
   type AxisDomain,
   type ChartConfig,
-  type ChartContainerProps,
   type ChartContext,
   type ChartCrosshairProps,
-  type ChartLegendProps,
-  type ChartTooltipProps,
+  type ChartLegendProps as ChartLegendPropsType, // Renamed to avoid conflict
+  type ChartTooltipProps as ChartTooltipPropsType, // Renamed to avoid conflict
 } from "./chart-types" // Assuming chart-types defines these
 
 import { cn } from "@/lib/utils"
@@ -47,6 +46,7 @@ interface CustomTooltipProps extends TooltipProps<any, any> { // Use any for Val
   nameKey?: string;
   valueKey?: string;
   hideIndicator?: boolean;
+  className?: string; // Added className here
 }
 
 const CustomTooltip = ({
@@ -69,6 +69,7 @@ const CustomTooltip = ({
         "grid min-w-[130px] gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs shadow-xl",
         className,
       )}
+      // Removed className from props here as it's already handled by cn
     >
       {formattedLabel ? (
         <div className="text-muted-foreground">{formattedLabel}</div>

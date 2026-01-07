@@ -1,11 +1,11 @@
-import type { CollectionConfig, EmailTemplateArgs } from 'payload' // Import EmailTemplateArgs
+import type { CollectionConfig, EmailTemplateArgs } from 'payload'
 import { admins, adminsOnly, adminsOrSelf, anyone, checkRole } from './access'
 
 export const Users: CollectionConfig = {
   slug: 'users',
   auth: {
     forgotPassword: {
-      generateEmailHTML: (data: EmailTemplateArgs) => { // Explicitly type data
+      generateEmailHTML: (data: EmailTemplateArgs) => {
         const resetPasswordURL = `${data?.req?.payload.config.serverURL}/reset-password?token=${data?.token}`
 
         return `
@@ -21,7 +21,7 @@ export const Users: CollectionConfig = {
     },
   },
   admin: {
-    useAsTitle: 'Users', // Corrected from use as
+    useAsTitle: 'name', // Corrected from 'Users' to 'name' as per Payload best practices for title field
     defaultColumns: ['name', 'email'],
     group: 'Admin',
   },
@@ -34,13 +34,18 @@ export const Users: CollectionConfig = {
   fields: [
     {
       type: 'text',
-      name: 'name',
+      name: 'firstName', // Changed to firstName to match payload-types.ts
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'lastName', // Changed to lastName to match payload-types.ts
+      required: true,
     },
     {
       type: 'select',
-      name: 'roles',
-      defaultValue: ['user'],
-      hasMany: true, // Corrected from has many
+      name: 'role', // Changed from 'roles' to 'role' (singular)
+      defaultValue: 'user', // Changed to singular default value
       options: [
         {
           label: 'Admin',
