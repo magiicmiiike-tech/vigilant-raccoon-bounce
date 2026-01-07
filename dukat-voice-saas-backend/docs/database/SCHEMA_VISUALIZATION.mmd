@@ -1,0 +1,478 @@
+erDiagram
+    %% Database 1: Authentication & Users
+    users {
+        uuid id PK
+        string email UK
+        string password_hash
+        string first_name
+        string last_name
+        boolean email_verified
+        boolean mfa_enabled
+        string mfa_secret
+        string status
+        jsonb metadata
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
+    }
+    
+    roles {
+        uuid id PK
+        string name UK
+        string description
+        jsonb permissions
+        boolean is_system
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    user_roles {
+        uuid id PK
+        uuid user_id FK
+        uuid role_id FK
+        uuid tenant_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    sessions {
+        uuid id PK
+        uuid user_id FK
+        string token
+        string refresh_token
+        string device_id
+        string device_type
+        string ip_address
+        text user_agent
+        timestamp expires_at
+        boolean revoked
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    audit_logs {
+        uuid id PK
+        uuid user_id FK
+        string action
+        string entity_type
+        string entity_id
+        jsonb old_values
+        jsonb new_values
+        string ip_address
+        text user_agent
+        timestamp created_at
+    }
+    
+    %% Database 2: Tenants & Configuration
+    tenants {
+        uuid id PK
+        string name
+        string domain UK
+        string plan_tier
+        string status
+        jsonb settings
+        timestamp trial_ends_at
+        timestamp subscription_ends_at
+        jsonb metadata
+        timestamp created_at
+        timestamp updated_at
+        timestamp deleted_at
+    }
+    
+    tenant_configs {
+        uuid id PK
+        uuid tenant_id FK,UK
+        jsonb voice_settings
+        jsonb agent_settings
+        jsonb telephony_settings
+        jsonb integration_settings
+        int version
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    api_keys {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+        string key_hash UK
+        string environment
+        jsonb scopes
+        timestamp expires_at
+        timestamp last_used_at
+        string last_used_ip
+        boolean is_revoked
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    webhooks {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+        text url
+        string secret
+        jsonb events
+        boolean enabled
+        jsonb retry_policy
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    webhook_deliveries {
+        uuid id PK
+        uuid webhook_id FK
+        string event_id
+        string event_type
+        jsonb payload
+        string status
+        int attempts
+        int max_attempts
+        timestamp next_attempt_at
+        timestamp last_attempt_at
+        int last_response_code
+        text last_response_body
+        timestamp delivered_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    feature_flags {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+        text description
+        boolean enabled
+        int rollout_percentage
+        jsonb target_users
+        jsonb target_segments
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    usage_quotas {
+        uuid id PK
+        uuid tenant_id FK
+        string resource_type
+        string resource_name
+        bigint limit_value
+        bigint current_usage
+        string period
+        timestamp reset_at
+        jsonb notifications_sent
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    %% Database 3: Voice Infrastructure
+    calls {
+        uuid id PK
+        uuid tenant_id FK
+        string call_sid
+        string from_number
+        string to_number
+        string caller_name
+        string direction
+        string status
+        timestamp started_at
+        timestamp answered_at
+        timestamp ended_at
+        int duration_seconds
+        text recording_url
+        text transcription_url
+        jsonb metadata
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    call_segments {
+        uuid id PK
+        uuid call_id FK
+        uuid agent_id FK
+        string segment_type
+        timestamp started_at
+        timestamp ended_at
+        int duration_seconds
+        jsonb metadata
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    call_recordings {
+        uuid id PK
+        uuid call_id FK
+        string recording_sid
+        text url
+        text transcription_url
+        int duration_seconds
+        bigint file_size_bytes
+        string format
+        boolean encrypted
+        string encryption_key
+        boolean deleted
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    phone_numbers {
+        uuid id PK
+        uuid tenant_id FK
+        string number
+        string country_code
+        string type
+        string provider
+        string provider_sid
+        string status
+        string assigned_to
+        jsonb capabilities
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    emergency_locations {
+        uuid id PK
+        uuid tenant_id FK
+        uuid phone_number_id FK
+        string address
+        string unit_number
+        string city
+        string state
+        string zip_code
+        string country
+        decimal latitude
+        decimal longitude
+        string validation_status
+        string validation_id
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    %% Database 4: AI Agents & Conversations
+    agents {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+        text description
+        string model
+        jsonb configuration
+        string status
+        jsonb training_data
+        jsonb performance_metrics
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    conversations {
+        uuid id PK
+        uuid tenant_id FK
+        uuid agent_id FK
+        uuid call_id FK
+        string session_id
+        string status
+        jsonb context
+        jsonb metadata
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    messages {
+        uuid id PK
+        uuid conversation_id FK
+        string role
+        text content
+        string audio_url
+        text transcription
+        jsonb metadata
+        timestamp created_at
+    }
+    
+    knowledge_bases {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+        text description
+        string chunking_strategy
+        int chunk_size
+        int chunk_overlap
+        int document_count
+        bigint total_size_bytes
+        jsonb embedding_config
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    documents {
+        uuid id PK
+        uuid knowledge_base_id FK
+        string name
+        text description
+        string file_type
+        text file_path
+        bigint file_size_bytes
+        string status
+        int chunk_count
+        jsonb metadata
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    %% Database 5: Analytics & Metrics
+    call_metrics {
+        uuid id PK
+        uuid tenant_id FK
+        timestamp timestamp
+        string period
+        int total_calls
+        int answered_calls
+        int missed_calls
+        int failed_calls
+        int total_duration
+        decimal average_handle_time
+        decimal average_wait_time
+        decimal service_level
+        jsonb queue_metrics
+        string metric_date
+        timestamp created_at
+    }
+    
+    agent_metrics {
+        uuid id PK
+        uuid tenant_id FK
+        uuid agent_id FK
+        timestamp timestamp
+        string period
+        int calls_handled
+        int calls_escalated
+        int total_talk_time
+        decimal average_handle_time
+        decimal customer_satisfaction
+        jsonb sentiment_scores
+        string metric_date
+        timestamp created_at
+    }
+    
+    voice_quality_metrics {
+        uuid id PK
+        uuid tenant_id FK
+        uuid call_id FK
+        timestamp timestamp
+        decimal mos_score
+        decimal packet_loss
+        int jitter
+        int latency
+        jsonb codec_metrics
+        string metric_date
+        timestamp created_at
+    }
+    
+    usage_metrics {
+        uuid id PK
+        uuid tenant_id FK
+        timestamp timestamp
+        string resource_type
+        string resource_name
+        bigint usage_amount
+        bigint cost_cents
+        jsonb metadata
+        string metric_date
+        timestamp created_at
+    }
+    
+    %% Database 6: Billing & Subscriptions
+    subscriptions {
+        uuid id PK
+        uuid tenant_id FK
+        string plan_id
+        string status
+        timestamp current_period_start
+        timestamp current_period_end
+        timestamp canceled_at
+        timestamp trial_ends_at
+        int quantity
+        jsonb metadata
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    invoices {
+        uuid id PK
+        uuid tenant_id FK
+        uuid subscription_id FK
+        string invoice_number
+        timestamp invoice_date
+        timestamp due_date
+        bigint amount_due
+        bigint amount_paid
+        bigint amount_remaining
+        string currency
+        string status
+        jsonb line_items
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    payments {
+        uuid id PK
+        uuid tenant_id FK
+        uuid invoice_id FK
+        string payment_method
+        string payment_intent_id
+        bigint amount
+        string currency
+        string status
+        timestamp payment_date
+        jsonb metadata
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    billing_events {
+        uuid id PK
+        uuid tenant_id FK
+        string event_type
+        jsonb data
+        timestamp event_date
+        jsonb metadata
+        timestamp created_at
+    }
+    
+    %% Relationships
+    users ||--o{ user_roles : "has"
+    roles ||--o{ user_roles : "assigned to"
+    users ||--o{ sessions : "creates"
+    users ||--o{ audit_logs : "generates"
+
+    tenants ||--o{ tenant_configs : "has"
+    tenants ||--o{ api_keys : "manages"
+    tenants ||--o{ webhooks : "configures"
+    tenants ||--o{ feature_flags : "controls"
+    tenants ||--o{ usage_quotas : "monitors"
+    tenants ||--o{ user_roles : "defines"
+
+    webhooks ||--o{ webhook_deliveries : "sends"
+
+    calls ||--o{ call_segments : "contains"
+    calls ||--o{ call_recordings : "generates"
+    tenants ||--o{ calls : "initiates"
+    tenants ||--o{ phone_numbers : "owns"
+    phone_numbers ||--o{ emergency_locations : "linked to"
+
+    tenants ||--o{ agents : "deploys"
+    agents ||--o{ conversations : "handles"
+    calls ||--o{ conversations : "part of"
+    conversations ||--o{ messages : "exchanges"
+    tenants ||--o{ knowledge_bases : "manages"
+    knowledge_bases ||--o{ documents : "stores"
+
+    tenants ||--o{ call_metrics : "tracks"
+    tenants ||--o{ agent_metrics : "monitors"
+    agents ||--o{ agent_metrics : "generates"
+    tenants ||--o{ voice_quality_metrics : "measures"
+    calls ||--o{ voice_quality_metrics : "reports on"
+    tenants ||--o{ usage_metrics : "records"
+
+    tenants ||--o{ subscriptions : "has"
+    subscriptions ||--o{ invoices : "generates"
+    invoices ||--o{ payments : "receives"
+    tenants ||--o{ billing_events : "logs"
+    invoices ||--o{ payments : "covers"
