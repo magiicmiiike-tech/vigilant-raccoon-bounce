@@ -1,5 +1,5 @@
 import type { CollectionConfig, EmailTemplateArgs } from 'payload'
-import { admins, adminsOnly, adminsOrSelf, anyone, checkRole } from './access'
+import { admins, adminsOnly, adminsOrSelf } from './access'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -21,8 +21,8 @@ export const Users: CollectionConfig = {
     },
   },
   admin: {
-    useAsTitle: 'name', // Corrected from 'Users' to 'name' as per Payload best practices for title field
-    defaultColumns: ['name', 'email'],
+    useAsTitle: 'firstName', // Changed to firstName
+    defaultColumns: ['firstName', 'lastName', 'email', 'role'],
     group: 'Admin',
   },
   access: {
@@ -34,18 +34,18 @@ export const Users: CollectionConfig = {
   fields: [
     {
       type: 'text',
-      name: 'firstName', // Changed to firstName to match payload-types.ts
+      name: 'firstName',
       required: true,
     },
     {
       type: 'text',
-      name: 'lastName', // Changed to lastName to match payload-types.ts
+      name: 'lastName',
       required: true,
     },
     {
       type: 'select',
-      name: 'role', // Changed from 'roles' to 'role' (singular)
-      defaultValue: 'user', // Changed to singular default value
+      name: 'role',
+      defaultValue: 'user',
       options: [
         {
           label: 'Admin',

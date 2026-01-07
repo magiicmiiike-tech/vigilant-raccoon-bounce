@@ -26,7 +26,7 @@ export const seed = async ({
           price: snack.price,
           category: snack.category,
           available: snack.available,
-          imageUrl: snack.imageUrl,
+          imageUrl: snack.imageUrl, // Now correctly maps to the new field
         },
         req,
       })
