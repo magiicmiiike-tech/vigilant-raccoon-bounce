@@ -1,32 +1,32 @@
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
 import { AppDataSource } from '../data-source';
-import { User } from '../entities/User';
+import { Profile } from '../entities/Profile'; // Changed from User to Profile
 import { config } from '../config/config';
 import { MfaSetupResponse } from '../types/auth.types';
 import { NotFoundError } from '../utils/errors';
 
 export class MfaService {
-  private userRepository = AppDataSource.getRepository(User);
+  private profileRepository = AppDataSource.getRepository(Profile); // Changed to profileRepository
 
-  async setupMfa(userId: string): Promise<MfaSetupResponse> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
+  async setupMfa(profileId: string): Promise<MfaSetupResponse> { // Changed userId to profileId
+    const profile = await this.profileRepository.findOne({ where: { id: profileId } }); // Changed user to profile
     
-    if (!user) {
-      throw new NotFoundError('User');
+    if (!profile) {
+      throw new NotFoundError('Profile'); // Changed User to Profile
     }
 
     // Generate secret
     const secret = speakeasy.generateSecret({
-      name: `${config.mfa.appName}:${user.email}`,
+      name: `${config.mfa.appName}:${profile.email}`, // Changed user.email to profile.email
     });
 
     // Generate QR code URL
     const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url);
 
     // Store secret temporarily (encrypted in real production)
-    user.mfaSecret = secret.base32;
-    await this.userRepository.save(user);
+    profile.mfaSecret = secret.base32;
+    await this.profileRepository.save(profile); // Changed userRepository to profileRepository
 
     return {
       secret: secret.base32,
@@ -34,36 +34,36 @@ export class MfaService {
     };
   }
 
-  async verifyMfa(userId: string, token: string): Promise<boolean> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
+  async verifyMfa(profileId: string, token: string): Promise<boolean> { // Changed userId to profileId
+    const profile = await this.profileRepository.findOne({ where: { id: profileId } }); // Changed user to profile
     
-    if (!user || !user.mfaSecret) {
-      throw new NotFoundError('User or MFA secret');
+    if (!profile || !profile.mfaSecret) {
+      throw new NotFoundError('Profile or MFA secret'); // Changed User to Profile
     }
 
     const verified = speakeasy.totp.verify({
-      secret: user.mfaSecret,
+      secret: profile.mfaSecret, // Changed user.mfaSecret to profile.mfaSecret
       encoding: 'base32',
       token,
       window: 1, // Allow 30 seconds before/after
     });
 
-    if (verified && !user.mfaEnabled) {
-      user.mfaEnabled = true;
-      await this.userRepository.save(user);
+    if (verified && !profile.mfaEnabled) { // Changed user.mfaEnabled to profile.mfaEnabled
+      profile.mfaEnabled = true; // Changed user.mfaEnabled to profile.mfaEnabled
+      await this.profileRepository.save(profile); // Changed userRepository to profileRepository
     }
 
     return verified;
   }
 
-  async disableMfa(userId: string): Promise<void> {
-    await this.userRepository.update(
-      { id: userId },
+  async disableMfa(profileId: string): Promise<void> { // Changed userId to profileId
+    await this.profileRepository.update( // Changed userRepository to profileRepository
+      { id: profileId },
       { mfaEnabled: false, mfaSecret: null }
     );
   }
 
-  async generateBackupCodes(userId: string, count: number = 10): Promise<string[]> {
+  async generateBackupCodes(profileId: string, count: number = 10): Promise<string[]> { // Changed userId to profileId
     const codes: string[] = [];
     
     for (let i = 0; i < count; i++) {
@@ -75,7 +75,7 @@ export class MfaService {
     return codes;
   }
 
-  async validateBackupCode(userId: string, code: string): Promise<boolean> {
+  async validateBackupCode(profileId: string, code: string): Promise<boolean> { // Changed userId to profileId
     // Implement backup code validation
     // This would check against stored (hashed) backup codes
     return false;

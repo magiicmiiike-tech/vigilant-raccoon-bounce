@@ -8,14 +8,14 @@ export class ApiKeyService {
   private apiKeyRepository = AppDataSource.getRepository(ApiKey);
 
   async createApiKey(
-    userId: string,
+    profileId: string, // Changed userId to profileId
     tenantId: string,
     name: string,
     scopes: string[],
     expiresInDays?: number
   ): Promise<{ apiKey: string; entity: ApiKey }> {
     const payload: ApiKeyPayload = {
-      sub: userId,
+      sub: profileId, // Changed userId to profileId
       tenantId,
       scopes,
       type: 'user',
@@ -25,7 +25,7 @@ export class ApiKeyService {
 
     const apiKeyEntity = this.apiKeyRepository.create({
       key: jwtToken,
-      userId,
+      profileId, // Changed userId to profileId
       tenantId,
       name,
       scopes,
@@ -104,9 +104,9 @@ export class ApiKeyService {
     }
   }
 
-  async revokeApiKey(apiKeyId: string, userId: string): Promise<void> {
+  async revokeApiKey(apiKeyId: string, profileId: string): Promise<void> { // Changed userId to profileId
     const apiKey = await this.apiKeyRepository.findOne({
-      where: { id: apiKeyId, userId },
+      where: { id: apiKeyId, profileId }, // Changed userId to profileId
     });
 
     if (!apiKey) {
@@ -117,23 +117,23 @@ export class ApiKeyService {
     await this.apiKeyRepository.save(apiKey);
   }
 
-  async revokeAllUserApiKeys(userId: string): Promise<void> {
+  async revokeAllProfileApiKeys(profileId: string): Promise<void> { // Changed userId to profileId
     await this.apiKeyRepository.update(
-      { userId, isActive: true },
+      { profileId, isActive: true }, // Changed userId to profileId
       { isActive: false }
     );
   }
 
-  async getUserApiKeys(userId: string): Promise<ApiKey[]> {
+  async getProfileApiKeys(profileId: string): Promise<ApiKey[]> { // Changed userId to profileId
     return this.apiKeyRepository.find({
-      where: { userId },
+      where: { profileId }, // Changed userId to profileId
       order: { createdAt: 'DESC' },
     });
   }
 
   async getTenantApiKeys(tenantId: string): Promise<ApiKey[]> {
     return this.apiKeyRepository.find({
-      where: { tenantId, userId: null }, // Tenant-level API keys
+      where: { tenantId, profileId: null }, // Tenant-level API keys
       order: { createdAt: 'DESC' },
     });
   }

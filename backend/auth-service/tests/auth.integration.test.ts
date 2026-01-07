@@ -1,12 +1,12 @@
 import request from 'supertest';
 import { createApp } from '../src/app';
 import { AppDataSource } from '../src/data-source';
-import { User } from '../src/entities/User';
-import { Application } from 'express'; // Fixed: Imported Application from express
+import { Profile } from '../src/entities/Profile'; // Changed from User to Profile
+import { Application } from 'express';
 
 describe('Auth Service Integration Tests', () => {
-  let app: Application; // Fixed: Changed type to Application
-  let testUser: User;
+  let app: Application;
+  let testProfile: Profile; // Changed from User to Profile
   let testTenantId = 'test-tenant-123';
 
   beforeAll(async () => {
@@ -21,11 +21,11 @@ describe('Auth Service Integration Tests', () => {
 
   beforeEach(async () => {
     // Clear database before each test
-    await AppDataSource.getRepository(User).clear();
+    await AppDataSource.getRepository(Profile).clear(); // Changed from User to Profile
   });
 
   describe('POST /api/auth/register', () => {
-    it('should register a new user', async () => {
+    it('should register a new profile', async () => { // Changed user to profile
       const response = await request(app)
         .post('/api/auth/register')
         .send({
@@ -40,7 +40,7 @@ describe('Auth Service Integration Tests', () => {
       expect(response.body.user.email).toBe('test@example.com');
       expect(response.body.tokens.accessToken).toBeDefined();
       expect(response.body.tokens.refreshToken).toBeDefined();
-      expect(response.body.user.password).toBeUndefined();
+      expect(response.body.user.passwordHash).toBeUndefined(); // Changed password to passwordHash
     });
 
     it('should reject weak passwords', async () => {
@@ -88,14 +88,14 @@ describe('Auth Service Integration Tests', () => {
 
   describe('POST /api/auth/login', () => {
     beforeEach(async () => {
-      // Create a test user
+      // Create a test profile
       await request(app)
         .post('/api/auth/register')
         .send({
           email: 'login@example.com',
           password: 'Test123!@#',
           firstName: 'Login',
-          lastName: 'User',
+          lastName: 'Profile', // Changed User to Profile
           tenantId: testTenantId,
         });
     });
@@ -161,7 +161,7 @@ describe('Auth Service Integration Tests', () => {
           email: 'refresh@example.com',
           password: 'Test123!@#',
           firstName: 'Refresh',
-          lastName: 'User',
+          lastName: 'Profile', // Changed User to Profile
           tenantId: testTenantId,
         });
 
@@ -198,7 +198,7 @@ describe('Auth Service Integration Tests', () => {
           email: 'protected@example.com',
           password: 'Test123!@#',
           firstName: 'Protected',
-          lastName: 'User',
+          lastName: 'Profile', // Changed User to Profile
           tenantId: testTenantId,
         });
 

@@ -1,5 +1,10 @@
-export { User } from './User';
-export { Session } from './Session';
+export { Profile } from './Profile';
+export { AppSession } from './AppSession';
 export { ApiKey } from './ApiKey';
 export { PasswordResetToken } from './PasswordResetToken';
 export { LoginAttempt } from './LoginAttempt';
+export { Role } from './Role';
+export { Permission } from './Permission';
+export { ProfileRole } from './ProfileRole';
+export { RolePermission } from './RolePermission';
+export { AuditLog } from './AuditLog';

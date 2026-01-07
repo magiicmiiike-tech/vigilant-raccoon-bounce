@@ -12,6 +12,7 @@ import {
   requireTenant,
   rateLimit 
 } from './middleware/auth.middleware';
+import { AppDataSource } from './data-source'; // Import AppDataSource to access isInitialized
 
 export const createApp = () => {
   const app = express();
@@ -50,6 +51,7 @@ export const createApp = () => {
       status: 'healthy',
       timestamp: new Date().toISOString(),
       service: 'auth-service',
+      database: AppDataSource.isInitialized ? 'connected' : 'disconnected', // Check DB connection
     });
   });
 
@@ -75,13 +77,13 @@ export const createApp = () => {
   app.delete('/api/auth/api-keys/:id', authenticateToken, authController.revokeApiKey.bind(authController));
 
   // Admin routes
-  app.get('/api/auth/admin/users', 
+  app.get('/api/auth/admin/profiles', // Changed /users to /profiles
     authenticateToken, 
     requireRole(['tenant_admin', 'super_admin']),
     requireTenant,
     (req: Request, res: Response) => { // Explicitly type parameters
-      // Implement user listing for admins
-      res.json({ message: 'Admin user list endpoint' });
+      // Implement profile listing for admins
+      res.json({ message: 'Admin profile list endpoint' });
     }
   );
 

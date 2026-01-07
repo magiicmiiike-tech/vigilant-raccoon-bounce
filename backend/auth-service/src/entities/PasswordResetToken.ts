@@ -7,11 +7,11 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from './User';
+import { Profile } from './Profile'; // Changed from User to Profile
 
 @Entity('password_reset_tokens')
 @Index(['token'], { unique: true })
-@Index(['userId'])
+@Index(['profileId']) // Changed from userId to profileId
 @Index(['expiresAt'])
 export class PasswordResetToken {
   @PrimaryGeneratedColumn('uuid')
@@ -20,12 +20,12 @@ export class PasswordResetToken {
   @Column({ unique: true })
   token!: string;
 
-  @Column({ name: 'user_id' })
-  userId!: string;
+  @Column({ name: 'profile_id' }) // Changed from user_id to profile_id
+  profileId!: string; // Changed from userId to profileId
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
-  user!: User;
+  @ManyToOne(() => Profile, (profile: Profile) => profile.passwordResetTokens, { onDelete: 'CASCADE' }) // Changed from User to Profile
+  @JoinColumn({ name: 'profile_id' }) // Changed from user_id to profile_id
+  profile!: Profile; // Changed from user to profile
 
   @Column({ name: 'expires_at' })
   expiresAt!: Date;

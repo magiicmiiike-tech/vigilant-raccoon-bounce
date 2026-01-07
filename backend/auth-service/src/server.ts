@@ -1,8 +1,7 @@
 import { createApp } from './app';
-import { initializeDatabase } from './data-source';
+import { initializeDatabase, AppDataSource } from './data-source'; // Import AppDataSource
 import { config } from './config/config';
 import { logger } from './utils/logger';
-import { AppDataSource } from './data-source'; // Import AppDataSource
 
 const startServer = async () => {
   try {

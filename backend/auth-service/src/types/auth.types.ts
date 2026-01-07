@@ -34,7 +34,7 @@ export interface UserResponse {
   firstName: string;
   lastName: string;
   phone?: string;
-  role: UserRole;
+  role: RoleType; // Changed from UserRole to RoleType
   tenantId: string;
   isActive: boolean;
   mfaEnabled: boolean;
@@ -49,19 +49,20 @@ export interface Tokens {
   expiresIn: number;
 }
 
-export enum UserRole {
-  SUPER_ADMIN = 'super_admin',
-  TENANT_ADMIN = 'tenant_admin',
-  USER = 'user',
-  AGENT = 'agent',
-  VIEWER = 'viewer',
-}
+// Removed UserRole enum as it's replaced by RoleType from db.types.ts
+// export enum UserRole {
+//   SUPER_ADMIN = 'super_admin',
+//   TENANT_ADMIN = 'tenant_admin',
+//   USER = 'user',
+//   AGENT = 'agent',
+//   VIEWER = 'viewer',
+// }
 
 export interface JwtPayload {
   sub: string;
   email: string;
   tenantId: string;
-  role: UserRole;
+  role: RoleType; // Changed from UserRole to RoleType
   iat?: number;
   exp?: number;
 }

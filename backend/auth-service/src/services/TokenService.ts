@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
+import * as crypto from 'crypto'; // Changed to import * as crypto
 import { config } from '../config/config';
 import { JwtPayload, ApiKeyPayload } from '../types/auth.types';
 import { AuthenticationError, AuthorizationError } from '../utils/errors';
@@ -23,7 +23,7 @@ export class TokenService {
         issuer: 'dukat-auth-service',
         audience: 'dukat-voice',
       }) as JwtPayload;
-    } catch (error: any) { // Fixed: Cast error to any
+    } catch (error: any) {
       if (error.name === 'TokenExpiredError') {
         throw new AuthenticationError('Access token expired');
       }
@@ -56,7 +56,7 @@ export class TokenService {
         issuer: 'dukat-auth-service',
         audience: 'dukat-voice-api',
       }) as ApiKeyPayload;
-    } catch (error: any) { // Fixed: Cast error to any
+    } catch (error: any) {
       throw new AuthorizationError('Invalid API key');
     }
   }
@@ -65,9 +65,9 @@ export class TokenService {
     return crypto.randomBytes(32).toString('hex');
   }
 
-  static generateMFAToken(userId: string): string {
+  static generateMFAToken(profileId: string): string { // Changed userId to profileId
     return jwt.sign(
-      { sub: userId, type: 'mfa' },
+      { sub: profileId, type: 'mfa' }, // Changed userId to profileId
       config.jwt.accessSecret,
       { expiresIn: '5m' }
     );
@@ -76,7 +76,7 @@ export class TokenService {
   static verifyMFAToken(token: string): { sub: string } {
     try {
       return jwt.verify(token, config.jwt.accessSecret) as { sub: string };
-    } catch (error: any) { // Fixed: Cast error to any
+    } catch (error: any) {
       throw new AuthenticationError('Invalid MFA token');
     }
   }

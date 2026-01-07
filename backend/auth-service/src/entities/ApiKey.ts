@@ -9,11 +9,12 @@ import {
   JoinColumn,
   BeforeInsert,
 } from 'typeorm';
-import { User } from './User';
+import { Profile } from './Profile'; // Changed from User to Profile
+import * as crypto from 'crypto'; // Changed to import * as crypto
 
 @Entity('api_keys')
 @Index(['key'], { unique: true })
-@Index(['userId'])
+@Index(['profileId']) // Changed from userId to profileId
 @Index(['tenantId'])
 @Index(['expiresAt'])
 export class ApiKey {
@@ -23,12 +24,12 @@ export class ApiKey {
   @Column({ unique: true })
   key!: string;
 
-  @Column({ name: 'user_id', nullable: true })
-  userId?: string;
+  @Column({ name: 'profile_id', nullable: true }) // Changed from user_id to profile_id
+  profileId?: string; // Changed from userId to profileId
 
-  @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
-  user?: User;
+  @ManyToOne(() => Profile, (profile: Profile) => profile.apiKeys, { nullable: true, onDelete: 'CASCADE' }) // Changed from User to Profile
+  @JoinColumn({ name: 'profile_id' }) // Changed from user_id to profile_id
+  profile?: Profile; // Changed from user to profile
 
   @Column({ name: 'tenant_id' })
   tenantId!: string;
@@ -45,7 +46,7 @@ export class ApiKey {
   @Column({ name: 'expires_at', nullable: true })
   expiresAt?: Date;
 
-  @Column({ default: true })
+  @Column({ default: true, name: 'is_active' }) // Added name for consistency
   isActive!: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -57,7 +58,7 @@ export class ApiKey {
   @BeforeInsert()
   generateKey() {
     if (!this.key) {
-      this.key = require('crypto').randomBytes(32).toString('hex');
+      this.key = crypto.randomBytes(32).toString('hex');
     }
   }
 

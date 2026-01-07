@@ -42,13 +42,13 @@ export class User extends BaseEntity {
   @Column({ type: 'jsonb', default: {} })
   metadata!: Record<string, any>;
 
-  @OneToMany(() => UserRole, (userRole) => userRole.user)
+  @OneToMany(() => UserRole, (userRole: UserRole) => userRole.user)
   roles!: UserRole[];
 
-  @OneToMany(() => Session, (session) => session.user)
+  @OneToMany(() => Session, (session: Session) => session.user)
   sessions!: Session[];
 
-  @OneToMany(() => AuditLog, (auditLog) => auditLog.user)
+  @OneToMany(() => AuditLog, (auditLog: AuditLog) => auditLog.user)
   auditLogs!: AuditLog[];
 }
 
@@ -66,7 +66,7 @@ export class Role extends BaseEntity {
   @Column({ default: true, name: 'is_system' })
   isSystem!: boolean;
 
-  @OneToMany(() => UserRole, (userRole) => userRole.role)
+  @OneToMany(() => UserRole, (userRole: UserRole) => userRole.role)
   userRoles!: UserRole[];
 }
 
@@ -81,15 +81,15 @@ export class UserRole extends BaseEntity {
   @Column({ nullable: true, name: 'tenant_id' })
   tenantId?: string;
 
-  @ManyToOne(() => User, (user) => user.roles)
+  @ManyToOne(() => User, (user: User) => user.roles)
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
-  @ManyToOne(() => Role, (role) => role.userRoles)
+  @ManyToOne(() => Role, (role: Role) => role.userRoles)
   @JoinColumn({ name: 'role_id' })
   role!: Role;
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.userRoles)
+  @ManyToOne(() => Tenant, (tenant: Tenant) => tenant.userRoles)
   @JoinColumn({ name: 'tenant_id' })
   tenant?: Tenant;
 }
@@ -123,7 +123,7 @@ export class Session extends BaseEntity {
   @Column({ default: false })
   revoked!: boolean;
 
-  @ManyToOne(() => User, (user) => user.sessions)
+  @ManyToOne(() => User, (user: User) => user.sessions)
   @JoinColumn({ name: 'user_id' })
   user!: User;
 }
@@ -154,7 +154,7 @@ export class AuditLog extends BaseEntity {
   @Column({ nullable: true, name: 'user_agent' })
   userAgent?: string;
 
-  @ManyToOne(() => User, (user) => user.auditLogs)
+  @ManyToOne(() => User, (user: User) => user.auditLogs)
   @JoinColumn({ name: 'user_id' })
   user!: User;
 }
@@ -194,22 +194,22 @@ export class Tenant extends BaseEntity {
   @Column({ type: 'jsonb', default: {} })
   metadata!: Record<string, any>;
 
-  @OneToMany(() => TenantConfig, (config) => config.tenant)
+  @OneToMany(() => TenantConfig, (config: TenantConfig) => config.tenant)
   config!: TenantConfig[]; // Changed to OneToMany as TenantConfig has a unique tenantId
 
-  @OneToMany(() => ApiKey, (apiKey) => apiKey.tenant)
+  @OneToMany(() => ApiKey, (apiKey: ApiKey) => apiKey.tenant)
   apiKeys!: ApiKey[];
 
-  @OneToMany(() => Webhook, (webhook) => webhook.tenant)
+  @OneToMany(() => Webhook, (webhook: Webhook) => webhook.tenant)
   webhooks!: Webhook[];
 
-  @OneToMany(() => FeatureFlag, (featureFlag) => featureFlag.tenant)
+  @OneToMany(() => FeatureFlag, (featureFlag: FeatureFlag) => featureFlag.tenant)
   featureFlags!: FeatureFlag[];
 
-  @OneToMany(() => UsageQuota, (quota) => quota.tenant)
+  @OneToMany(() => UsageQuota, (quota: UsageQuota) => quota.tenant)
   quotas!: UsageQuota[];
 
-  @OneToMany(() => UserRole, (userRole) => userRole.tenant)
+  @OneToMany(() => UserRole, (userRole: UserRole) => userRole.tenant)
   userRoles!: UserRole[];
 }
 
@@ -269,7 +269,7 @@ export class TenantConfig extends BaseEntity {
   @Column({ default: 1 })
   version!: number;
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.config)
+  @ManyToOne(() => Tenant, (tenant: Tenant) => tenant.config)
   @JoinColumn({ name: 'tenant_id' })
   tenant!: Tenant;
 }
@@ -303,7 +303,7 @@ export class ApiKey extends BaseEntity {
   @Column({ default: false, name: 'is_revoked' })
   isRevoked!: boolean;
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.apiKeys)
+  @ManyToOne(() => Tenant, (tenant: Tenant) => tenant.apiKeys) // Assuming phone numbers are linked to tenants
   @JoinColumn({ name: 'tenant_id' })
   tenant!: Tenant;
 }
@@ -334,11 +334,11 @@ export class Webhook extends BaseEntity {
     backoffFactor: number;
   };
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.webhooks)
+  @ManyToOne(() => Tenant, (tenant: Tenant) => tenant.webhooks)
   @JoinColumn({ name: 'tenant_id' })
   tenant!: Tenant;
 
-  @OneToMany(() => WebhookDelivery, (delivery) => delivery.webhook)
+  @OneToMany(() => WebhookDelivery, (delivery: WebhookDelivery) => delivery.webhook)
   deliveries!: WebhookDelivery[];
 }
 
@@ -380,7 +380,7 @@ export class WebhookDelivery extends BaseEntity {
   @Column({ type: 'timestamp', nullable: true, name: 'delivered_at' })
   deliveredAt?: Date;
 
-  @ManyToOne(() => Webhook, (webhook) => webhook.deliveries)
+  @ManyToOne(() => Webhook, (webhook: Webhook) => webhook.deliveries)
   @JoinColumn({ name: 'webhook_id' })
   webhook!: Webhook;
 }
@@ -408,7 +408,7 @@ export class FeatureFlag extends BaseEntity {
   @Column({ type: 'jsonb', default: [], name: 'target_segments' })
   targetSegments!: string[];
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.featureFlags)
+  @ManyToOne(() => Tenant, (tenant: Tenant) => tenant.featureFlags)
   @JoinColumn({ name: 'tenant_id' })
   tenant!: Tenant;
 }
@@ -443,7 +443,7 @@ export class UsageQuota extends BaseEntity {
     threshold: number;
   }>;
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.quotas)
+  @ManyToOne(() => Tenant, (tenant: Tenant) => tenant.quotas)
   @JoinColumn({ name: 'tenant_id' })
   tenant!: Tenant;
 }
@@ -496,10 +496,10 @@ export class Call extends BaseEntity {
   @Column({ type: 'jsonb', default: {} })
   metadata!: Record<string, any>;
 
-  @OneToMany(() => CallSegment, (segment) => segment.call)
+  @OneToMany(() => CallSegment, (segment: CallSegment) => segment.call)
   segments!: CallSegment[];
 
-  @OneToMany(() => CallRecording, (recording) => recording.call)
+  @OneToMany(() => CallRecording, (recording: CallRecording) => recording.call)
   recordings!: CallRecording[];
 }
 
@@ -526,7 +526,7 @@ export class CallSegment extends BaseEntity {
   @Column({ type: 'jsonb', default: {} })
   metadata!: Record<string, any>;
 
-  @ManyToOne(() => Call, (call) => call.segments)
+  @ManyToOne(() => Call, (call: Call) => call.segments)
   @JoinColumn({ name: 'call_id' })
   call!: Call;
 }
@@ -563,7 +563,7 @@ export class CallRecording extends BaseEntity {
   @Column({ default: false })
   deleted!: boolean;
 
-  @ManyToOne(() => Call, (call) => call.recordings)
+  @ManyToOne(() => Call, (call: Call) => call.recordings)
   @JoinColumn({ name: 'call_id' })
   call!: Call;
 }
@@ -602,11 +602,11 @@ export class PhoneNumber extends BaseEntity {
     fax: boolean;
   };
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.apiKeys) // Assuming phone numbers are linked to tenants
+  @ManyToOne(() => Tenant, (tenant: Tenant) => tenant.apiKeys) // Assuming phone numbers are linked to tenants
   @JoinColumn({ name: 'tenant_id' })
   tenant!: Tenant;
 
-  @OneToMany(() => EmergencyLocation, (location) => location.phoneNumber)
+  @OneToMany(() => EmergencyLocation, (location: EmergencyLocation) => location.phoneNumber)
   emergencyLocations!: EmergencyLocation[];
 }
 
@@ -648,7 +648,7 @@ export class EmergencyLocation extends BaseEntity {
   @Column({ nullable: true, name: 'validation_id' })
   validationId?: string;
 
-  @ManyToOne(() => PhoneNumber, (phoneNumber) => phoneNumber.emergencyLocations)
+  @ManyToOne(() => PhoneNumber, (phoneNumber: PhoneNumber) => phoneNumber.emergencyLocations)
   @JoinColumn({ name: 'phone_number_id' })
   phoneNumber!: PhoneNumber;
 }
@@ -704,11 +704,11 @@ export class Agent extends BaseEntity {
     averageHandleTime: number;
   };
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.apiKeys) // Assuming agents are linked to tenants
+  @ManyToOne(() => Tenant, (tenant: Tenant) => tenant.apiKeys) // Assuming agents are linked to tenants
   @JoinColumn({ name: 'tenant_id' })
   tenant!: Tenant;
 
-  @OneToMany(() => Conversation, (conversation) => conversation.agent)
+  @OneToMany(() => Conversation, (conversation: Conversation) => conversation.agent)
   conversations!: Conversation[];
 }
 
@@ -744,15 +744,15 @@ export class Conversation extends BaseEntity {
   @Column({ type: 'jsonb', default: {} })
   metadata!: Record<string, any>;
 
-  @ManyToOne(() => Agent, (agent) => agent.conversations)
+  @ManyToOne(() => Agent, (agent: Agent) => agent.conversations)
   @JoinColumn({ name: 'agent_id' })
   agent!: Agent;
 
-  @ManyToOne(() => Call, (call) => call.segments) // Assuming conversations can be linked to calls
+  @ManyToOne(() => Call, (call: Call) => call.segments) // Assuming conversations can be linked to calls
   @JoinColumn({ name: 'call_id' })
   call?: Call;
 
-  @OneToMany(() => Message, (message) => message.conversation)
+  @OneToMany(() => Message, (message: Message) => message.conversation)
   messages!: Message[];
 }
 
@@ -781,7 +781,7 @@ export class Message extends BaseEntity {
     confidence: number;
   };
 
-  @ManyToOne(() => Conversation, (conversation) => conversation.messages)
+  @ManyToOne(() => Conversation, (conversation: Conversation) => conversation.messages)
   @JoinColumn({ name: 'conversation_id' })
   conversation!: Conversation;
 }
@@ -819,11 +819,11 @@ export class KnowledgeBase extends BaseEntity {
     provider: 'openai' | 'cohere' | 'huggingface';
   };
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.apiKeys) // Assuming knowledge bases are linked to tenants
+  @ManyToOne(() => Tenant, (tenant: Tenant) => tenant.apiKeys) // Assuming knowledge bases are linked to tenants
   @JoinColumn({ name: 'tenant_id' })
   tenant!: Tenant;
 
-  @OneToMany(() => Document, (document) => document.knowledgeBase)
+  @OneToMany(() => Document, (document: Document) => document.knowledgeBase)
   documents!: Document[];
 }
 
@@ -856,7 +856,7 @@ export class Document extends BaseEntity {
   @Column({ type: 'jsonb', default: {} })
   metadata!: Record<string, any>;
 
-  @ManyToOne(() => KnowledgeBase, (knowledgeBase) => knowledgeBase.documents)
+  @ManyToOne(() => KnowledgeBase, (knowledgeBase: KnowledgeBase) => knowledgeBase.documents)
   @JoinColumn({ name: 'knowledge_base_id' })
   knowledgeBase!: KnowledgeBase;
 }
@@ -1073,11 +1073,11 @@ export class Subscription extends BaseEntity {
   @Column({ type: 'jsonb', default: {} })
   metadata!: Record<string, any>;
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.apiKeys) // Assuming subscriptions are linked to tenants
+  @ManyToOne(() => Tenant, (tenant: Tenant) => tenant.apiKeys) // Assuming subscriptions are linked to tenants
   @JoinColumn({ name: 'tenant_id' })
   tenant!: Tenant;
 
-  @OneToMany(() => Invoice, (invoice) => invoice.subscription)
+  @OneToMany(() => Invoice, (invoice: Invoice) => invoice.subscription)
   invoices!: Invoice[];
 }
 
@@ -1125,7 +1125,7 @@ export class Invoice extends BaseEntity {
     };
   }>;
 
-  @ManyToOne(() => Subscription, (subscription) => subscription.invoices)
+  @ManyToOne(() => Subscription, (subscription: Subscription) => subscription.invoices)
   @JoinColumn({ name: 'subscription_id' })
   subscription!: Subscription;
 

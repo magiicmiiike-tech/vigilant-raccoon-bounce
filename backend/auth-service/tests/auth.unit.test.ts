@@ -1,8 +1,9 @@
 import { PasswordService } from '../src/services/PasswordService';
 import { TokenService } from '../src/services/TokenService';
 import { ValidationError } from '../src/utils/errors';
-import jwt from 'jsonwebtoken'; // Import jwt for testing expired tokens
-import type { DoneCallback } from '@jest/types/build/Global'; // Fixed: Imported DoneCallback
+import jwt from 'jsonwebtoken';
+import { RoleType } from '../src/types/db.types'; // Import RoleType
+import { DoneCallback } from '@types/jest'; // Import DoneCallback
 
 describe('PasswordService Unit Tests', () => {
   describe('validateStrength', () => {
@@ -66,18 +67,15 @@ describe('PasswordService Unit Tests', () => {
 
 describe('TokenService Unit Tests', () => {
   const testPayload = {
-    sub: 'user-123',
+    sub: 'profile-123', // Changed user-123 to profile-123
     email: 'test@example.com',
     tenantId: 'tenant-123',
-    role: 'user' as const,
+    role: RoleType.USER, // Changed 'user' as const to RoleType.USER
   };
 
   describe('generateAccessToken', () => {
     it('should generate a valid JWT', () => {
-      const token = TokenService.generateAccessToken({
-        ...testPayload,
-        role: testPayload.role as any, // Fixed: Cast role to any for test payload compatibility
-      });
+      const token = TokenService.generateAccessToken(testPayload);
       
       expect(typeof token).toBe('string');
       expect(token.split('.')).toHaveLength(3); // JWT has 3 parts
@@ -86,10 +84,7 @@ describe('TokenService Unit Tests', () => {
 
   describe('verifyAccessToken', () => {
     it('should verify valid tokens', () => {
-      const token = TokenService.generateAccessToken({
-        ...testPayload,
-        role: testPayload.role as any, // Fixed: Cast role to any
-      });
+      const token = TokenService.generateAccessToken(testPayload);
       const decoded = TokenService.verifyAccessToken(token);
       
       expect(decoded.sub).toBe(testPayload.sub);
@@ -100,10 +95,10 @@ describe('TokenService Unit Tests', () => {
       expect(decoded.iat).toBeDefined();
     });
 
-    it('should reject expired tokens', (done: DoneCallback) => { // Fixed: Used DoneCallback
+    it('should reject expired tokens', (done: DoneCallback) => { // Explicitly typed done
       // Generate token with 1ms expiry
       const expiredToken = jwt.sign(
-        { ...testPayload, role: testPayload.role as any }, // Fixed: Cast role to any
+        testPayload,
         'test-secret', // Use a consistent secret for testing
         { expiresIn: '1ms' }
       );
@@ -127,7 +122,7 @@ describe('TokenService Unit Tests', () => {
   describe('generateApiKey', () => {
     it('should generate API keys with prefix', () => {
       const payload = {
-        sub: 'user-123',
+        sub: 'profile-123', // Changed user-123 to profile-123
         tenantId: 'tenant-123',
         scopes: ['read', 'write'],
         type: 'user' as const,

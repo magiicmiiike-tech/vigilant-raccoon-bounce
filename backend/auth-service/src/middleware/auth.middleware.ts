@@ -2,10 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import { TokenService } from '../services/TokenService';
 import { SessionService } from '../services/SessionService';
 import { AppDataSource } from '../data-source';
-import { Session } from '../entities/Session';
-import { AuthenticationError, AuthorizationError, ValidationError } from '../utils/errors'; // Import ValidationError
+import { AppSession } from '../entities/AppSession'; // Changed from Session to AppSession
+import { AuthenticationError, AuthorizationError, ValidationError } from '../utils/errors';
 import { logger } from '../utils/logger';
-import { ApiKeyService } from '../services/ApiKeyService'; // Import ApiKeyService
+import { ApiKeyService } from '../services/ApiKeyService';
 
 declare global {
   namespace Express {
@@ -34,10 +34,10 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       req.apiKey = apiKey;
       req.tenantId = apiKey.tenantId;
       req.user = {
-        sub: apiKey.userId || apiKey.tenantId,
+        sub: apiKey.profileId || apiKey.tenantId, // Changed userId to profileId
         tenantId: apiKey.tenantId,
         scopes: apiKey.scopes,
-        type: apiKey.userId ? 'user' : 'tenant',
+        type: apiKey.profileId ? 'user' : 'tenant', // Changed userId to profileId
       };
       
       return next();
@@ -46,8 +46,13 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     // Regular JWT token
     const payload = TokenService.verifyAccessToken(token);
     
-    // Check if session is still valid (optional, adds overhead)
-    // In production, you might want to check Redis for blacklisted tokens
+    // Optionally, verify session validity in the database/Redis
+    // This adds overhead but provides stronger revocation capabilities
+    // const sessionService = new SessionService();
+    // const session = await sessionService.validateSession(payload.sessionId, payload.refreshToken);
+    // if (!session) {
+    //   throw new AuthenticationError('Session invalidated or not found');
+    // }
     
     req.user = payload;
     req.tenantId = payload.tenantId;
