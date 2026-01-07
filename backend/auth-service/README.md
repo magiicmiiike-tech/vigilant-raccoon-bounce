@@ -76,17 +76,14 @@ npm run migration:run
 - Add Prometheus metrics endpoint
 - Configure logging aggregation
 - Set up alerting for failed logins
-
 ### 4. Additional Security
 - Implement IP whitelisting for admin endpoints
 - Add audit logging for sensitive operations
 - Configure certificate-based authentication
-
 ### 5. Performance Optimization
 - Add Redis connection pooling
 - Implement database connection pooling
 - Add request/response compression
-
 ## Ready for Session 03:
 The auth service is complete and ready to integrate with the other services. The next session can focus on:
 1. Tenant service implementation

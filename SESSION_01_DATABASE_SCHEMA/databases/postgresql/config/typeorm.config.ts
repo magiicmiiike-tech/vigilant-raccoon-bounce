@@ -1,9 +1,10 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { databaseConfigs } from './database.config';
+import * as authEntities from '../../../src/entities'; // Import all entities from the auth service
 
 // Define paths for entities and migrations for each database
 const entityPaths = {
-  auth: ['src/entities/auth/**/*.ts'],
+  auth: ['SESSION_01_DATABASE_SCHEMA/src/entities/**/*.ts'], // Updated path for auth entities
   tenants: ['src/entities/tenants/**/*.ts'],
   telephony: ['src/entities/telephony/**/*.ts'],
   billing: ['src/entities/billing/**/*.ts'],
@@ -13,7 +14,7 @@ const entityPaths = {
 };
 
 const migrationPaths = {
-  auth: ['src/migrations/auth/**/*.ts'],
+  auth: ['SESSION_01_DATABASE_SCHEMA/databases/postgresql/migrations/**/*.ts'], // Updated path for auth migrations
   tenants: ['src/migrations/tenants/**/*.ts'],
   telephony: ['src/migrations/telephony/**/*.ts'],
   billing: ['src/migrations/billing/**/*.ts'],
@@ -36,7 +37,7 @@ export const createDataSource = (
   return new DataSource({
     type: 'postgres',
     ...config,
-    entities,
+    entities: databaseKey === 'auth' ? Object.values(authEntities) : entities, // Use imported auth entities for 'auth'
     migrations,
     synchronize: false, // NEVER true in production
     logging: process.env.NODE_ENV === 'development',
