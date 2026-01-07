@@ -9,38 +9,38 @@ import { UsageRecord } from './UsageRecord';
 @Index(['stripeSubscriptionId'], { unique: true, where: 'deleted_at IS NULL' })
 export class Subscription extends TenantEntity {
   @Column({ type: 'uuid' })
-  planId: string;
+  planId!: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  stripeSubscriptionId: string;
+  stripeSubscriptionId?: string;
 
   @Column({ type: 'varchar', length: 50, default: 'active' })
-  status: 'active' | 'trialing' | 'past_due' | 'canceled' | 'unpaid';
+  status!: 'active' | 'trialing' | 'past_due' | 'canceled' | 'unpaid';
 
   @Column({ type: 'timestamptz' })
-  startDate: Date;
+  startDate!: Date;
 
   @Column({ type: 'timestamptz', nullable: true })
-  endDate: Date;
+  endDate?: Date;
 
   @Column({ type: 'timestamptz', nullable: true })
-  trialEndsAt: Date;
+  trialEndsAt?: Date;
 
   @Column({ type: 'timestamptz' })
-  currentPeriodStart: Date;
+  currentPeriodStart!: Date;
 
   @Column({ type: 'timestamptz' })
-  currentPeriodEnd: Date;
+  currentPeriodEnd!: Date;
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 
-  @ManyToOne(() => Plan, (plan) => plan.subscriptions)
-  plan: Plan;
+  @ManyToOne(() => Plan, (plan: Plan) => plan.subscriptions)
+  plan!: Plan;
 
-  @OneToMany(() => Invoice, (invoice) => invoice.subscription)
-  invoices: Invoice[];
+  @OneToMany(() => Invoice, (invoice: Invoice) => invoice.subscription)
+  invoices!: Invoice[];
 
-  @OneToMany(() => UsageRecord, (usageRecord) => usageRecord.subscription)
-  usageRecords: UsageRecord[];
+  @OneToMany(() => UsageRecord, (usageRecord: UsageRecord) => usageRecord.subscription)
+  usageRecords!: UsageRecord[];
 }

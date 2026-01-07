@@ -88,7 +88,8 @@
     "reflect-metadata": "^0.2.2",
     "pg": "^8.12.0",
     "pgvector": "^0.1.0",
-    "timescaledb-prom-wrapper": "^1.0.0"
+    "timescaledb-prom-wrapper": "^1.0.0",
+    "bcrypt": "^5.1.1"
   },
   "devDependencies": {
     "@dyad-sh/nextjs-webpack-component-tagger": "^0.8.0",
@@ -108,7 +109,9 @@
     "typescript": "5.7.3",
     "@types/pg": "^8.11.6",
     "@mermaid-js/mermaid-cli": "^10.9.1",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "@types/bcrypt": "^5.0.2",
+    "@types/typeorm": "^0.2.60"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0",
