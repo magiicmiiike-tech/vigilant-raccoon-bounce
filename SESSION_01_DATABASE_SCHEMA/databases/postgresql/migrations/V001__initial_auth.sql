@@ -51,6 +51,9 @@ FOR SELECT TO authenticated USING (auth.uid() = user_id);
 CREATE POLICY "Allow authenticated users to insert their own app sessions" ON public.app_sessions
 FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
 
--- Allow authenticated users to delete their own app sessions
+-- Allow authenticated users to delete their own app sessions" ON public.app_sessions
 CREATE POLICY "Allow authenticated users to delete their own app sessions" ON public.app_sessions
 FOR DELETE TO authenticated USING (auth.uid() = user_id);
+
+-- Add index on user_id for app_sessions for faster lookups
+CREATE INDEX idx_app_sessions_user_id ON public.app_sessions (user_id);
