@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { admins, adminsOnly, anyone } from './access'
+import { admins, adminsOnly, anyone } from './access' // Import adminsOnly and anyone
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -7,8 +7,10 @@ export const Media: CollectionConfig = {
     read: anyone,
     create: admins,
     update: admins,
-    delete: admins,
-    admin: adminsOnly,
+    delete: adminsOnly,
+  },
+  upload: {
+    staticDir: './media',
   },
   fields: [
     {
@@ -17,5 +19,4 @@ export const Media: CollectionConfig = {
       required: true,
     },
   ],
-  upload: true,
 }

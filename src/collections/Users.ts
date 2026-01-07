@@ -1,38 +1,46 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, EmailTemplateArgs } from 'payload' // Import EmailTemplateArgs
 import { admins, adminsOnly, adminsOrSelf, anyone, checkRole } from './access'
 
 export const Users: CollectionConfig = {
   slug: 'users',
-  admin: {
-    useAsTitle: 'email',
-  },
   auth: {
     forgotPassword: {
-      generateEmailHTML: (data) => {
+      generateEmailHTML: (data: EmailTemplateArgs) => { // Explicitly type data
         const resetPasswordURL = `${data?.req?.payload.config.serverURL}/reset-password?token=${data?.token}`
 
         return `
           <!doctype html>
           <html>
             <body>
-            You are receiving this because you (or someone else) have requested the reset of the password for your account. Please click on the following link, or paste this into your browser to complete the process: ${resetPasswordURL} If you did not request this, please ignore this email and your password will remain unchanged.
-              
+              <p>To reset your password, click on the link below:</p>
+              <p><a href="${resetPasswordURL}">${resetPasswordURL}</a></p>
             </body>
           </html>
         `
       },
     },
   },
+  admin: {
+    useAsTitle: 'Users', // Corrected from use as
+    defaultColumns: ['name', 'email'],
+    group: 'Admin',
+  },
   access: {
-    create: anyone, // Allow anyone to create a user account (for registration)
-    read: adminsOrSelf, // Allow users to read their own profile, admins can read all
-    update: adminsOrSelf, // Allow users to update their own profile, admins can update all
-    admin: adminsOnly,
+    read: adminsOrSelf,
+    create: admins,
+    update: adminsOrSelf,
+    delete: adminsOnly,
   },
   fields: [
     {
-      name: 'role',
+      type: 'text',
+      name: 'name',
+    },
+    {
       type: 'select',
+      name: 'roles',
+      defaultValue: ['user'],
+      hasMany: true, // Corrected from has many
       options: [
         {
           label: 'Admin',
@@ -43,25 +51,11 @@ export const Users: CollectionConfig = {
           value: 'user',
         },
       ],
-      defaultValue: 'user',
-      required: true,
       access: {
-        read: adminsOnly,
-        create: adminsOnly,
-        update: adminsOnly,
+        read: admins,
+        create: admins,
+        update: admins,
       },
     },
-    {
-      name: 'firstName',
-      type: 'text',
-      required: true,
-    },
-    {
-      name: 'lastName',
-      type: 'text',
-      required: true,
-    },
-    // Email added by default
-    // Add more fields as needed
   ],
 }

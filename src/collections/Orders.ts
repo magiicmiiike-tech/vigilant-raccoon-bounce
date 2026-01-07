@@ -1,17 +1,18 @@
 import type { CollectionConfig } from 'payload'
-import { admins, adminsOnly, adminsOrOwner, authenticated } from './access'
+import { admins, adminsOnly, adminsOrOwner, authenticated } from './access' // Import adminsOnly
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
   admin: {
     useAsTitle: 'id',
+    defaultColumns: ['id', 'user', 'total', 'status'],
+    group: 'Shop',
   },
   access: {
-    read: adminsOrOwner('user'), // Admins can read all orders, users can only read their own
-    create: authenticated, // Any authenticated user can create orders
-    update: admins, // Only admins can update orders
-    delete: admins, // Only admins can delete orders
-    admin: adminsOnly,
+    read: adminsOrOwner(),
+    create: authenticated,
+    update: adminsOnly,
+    delete: adminsOnly,
   },
   fields: [
     {
@@ -19,6 +20,7 @@ export const Orders: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       required: true,
+      hasMany: false,
     },
     {
       name: 'items',
@@ -37,30 +39,24 @@ export const Orders: CollectionConfig = {
           min: 1,
         },
       ],
+    },
+    {
+      name: 'total',
+      type: 'number',
       required: true,
-      minRows: 1,
+      min: 0,
     },
     {
       name: 'status',
       type: 'select',
       options: [
         { label: 'Pending', value: 'pending' },
-        { label: 'Completed', value: 'completed' },
+        { label: 'Processing', value: 'processing' },
+        { label: 'Shipped', value: 'shipped' },
+        { label: 'Delivered', value: 'delivered' },
         { label: 'Cancelled', value: 'cancelled' },
       ],
       defaultValue: 'pending',
-      required: true,
-    },
-    {
-      name: 'totalAmount',
-      type: 'number',
-      required: true,
-      min: 0,
-    },
-    {
-      name: 'orderDate',
-      type: 'date',
-      defaultValue: () => new Date(),
       required: true,
     },
   ],

@@ -1,27 +1,16 @@
 import { withPayload } from '@payloadcms/next/withPayload'
 import { NextConfig } from 'next'
+import { Configuration as WebpackConfig } from 'webpack' // Import WebpackConfig type
 
 const nextConfig: NextConfig = {
-  webpack: (config) => {
+  webpack: (config: WebpackConfig) => { // Explicitly type config parameter
     if (process.env.NODE_ENV === 'development') {
-      config.module.rules.push({
-        test: /\.(jsx|tsx)$/,
-        exclude: /node_modules/,
-        enforce: 'pre',
-        use: '@dyad-sh/nextjs-webpack-component-tagger',
-      })
+      config.watchOptions = {
+        ignore: /node_modules/,
+      }
     }
     return config
   },
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
-    ],
-  },
-  // Your Next.js config here
 }
 
-export default withPayload(nextConfig, { devBundleServerPackages: false })
+export default withPayload(nextConfig)
