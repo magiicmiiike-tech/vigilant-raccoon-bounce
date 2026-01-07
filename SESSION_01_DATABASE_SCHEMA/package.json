@@ -1,0 +1,43 @@
+{
+  "name": "dukat-voice-saas-db",
+  "version": "1.0.0",
+  "description": "Database schema and migrations for Dukat Voice AI SaaS",
+  "license": "MIT",
+  "scripts": {
+    "start": "ts-node src/main.ts",
+    "start:dev": "nest start --watch",
+    "build": "nest build",
+    "migration:generate": "typeorm migration:generate",
+    "migration:run": "typeorm migration:run -d databases/postgresql/config/typeorm.config.ts",
+    "migration:revert": "typeorm migration:revert -d databases/postgresql/config/typeorm.config.ts",
+    "schema:sync": "typeorm schema:sync -d databases/postgresql/config/typeorm.config.ts",
+    "seed:run": "ts-node scripts/seed-database.ts",
+    "validate:schema": "ts-node scripts/validate-schema.ts",
+    "test:integration": "ts-node scripts/test-integration.ts",
+    "generate-diagrams": "mmdc -i diagrams/full_er_diagram.mmd -o diagrams/full_er_diagram.png"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/config": "^3.0.0",
+    "@nestjs/typeorm": "^10.0.0",
+    "typeorm": "^0.3.0",
+    "pg": "^8.0.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.0.0",
+    "class-validator": "^0.14.0",
+    "class-transformer": "^0.5.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.0.0",
+    "@nestjs/schematics": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "@types/express": "^4.17.21",
+    "@types/pg": "^8.0.0",
+    "@types/uuid": "^9.0.0",
+    "ts-node": "^10.0.0",
+    "typescript": "^5.0.0",
+    "@mermaid-js/mermaid-cli": "^10.9.1"
+  }
+}
