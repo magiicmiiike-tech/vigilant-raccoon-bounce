@@ -6,17 +6,17 @@ import { TenantEntity } from '../shared/BaseEntity';
 @Index(['callId', 'timestamp'])
 export class CallMetric extends TenantEntity {
   @Column({ type: 'uuid' })
-  callId: string;
+  callId!: string;
 
   @Column({ type: 'timestamptz' })
-  timestamp: Date;
+  timestamp!: Date;
 
   @Column({ type: 'varchar', length: 100 })
-  metricName: string; // e.g., 'latency', 'jitter', 'packet_loss'
+  metricName!: string; // e.g., 'latency', 'jitter', 'packet_loss'
 
   @Column({ type: 'numeric', precision: 10, scale: 4 })
-  metricValue: number;
+  metricValue!: number;
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 }

@@ -6,31 +6,31 @@ import { Call } from './Call';
 @Index(['callId', 'startTime'])
 export class CallRecording extends TenantEntity {
   @Column({ type: 'uuid' })
-  callId: string;
+  callId!: string;
 
   @Column({ type: 'varchar', length: 255 })
-  storageUrl: string;
+  storageUrl!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  encryptionKeyId: string;
+  encryptionKeyId!: string;
 
   @Column({ type: 'timestamptz' })
-  startTime: Date;
+  startTime!: Date;
 
   @Column({ type: 'timestamptz', nullable: true })
-  endTime: Date;
+  endTime!: Date;
 
   @Column({ type: 'integer', nullable: true })
-  durationSeconds: number;
+  durationSeconds!: number;
 
   @Column({ type: 'bigint', nullable: true })
-  fileSizeBytes: number;
+  fileSizeBytes!: number;
 
   @Column({ type: 'varchar', length: 50 })
-  format: 'wav' | 'mp3' | 'ogg';
+  format!: 'wav' | 'mp3' | 'ogg';
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: {
+  metadata!: {
     sampleRate?: number;
     channels?: number;
     bitRate?: number;
@@ -38,11 +38,11 @@ export class CallRecording extends TenantEntity {
   };
 
   @Column({ type: 'boolean', default: false })
-  isEncrypted: boolean;
+  isEncrypted!: boolean;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  transcriptionStatus: 'pending' | 'processing' | 'completed' | 'failed';
+  transcriptionStatus!: 'pending' | 'processing' | 'completed' | 'failed';
 
-  @ManyToOne(() => Call, (call) => call.recordings, { onDelete: 'CASCADE' })
-  call: Call;
+  @ManyToOne(() => Call, (call: Call) => call.recordings, { onDelete: 'CASCADE' })
+  call!: Call;
 }

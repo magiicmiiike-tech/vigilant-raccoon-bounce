@@ -9,40 +9,40 @@ import { CallTranscript } from './CallTranscript';
 @Index(['fromNumber', 'direction'])
 export class Call extends TenantEntity {
   @Column({ type: 'varchar', length: 100 })
-  callSid: string; // Unique ID from telephony provider
+  callSid!: string; // Unique ID from telephony provider
 
   @Column({ type: 'uuid', nullable: true })
-  userId: string; // User who initiated/received the call
+  userId!: string; // User who initiated/received the call
 
   @Column({ type: 'varchar', length: 20 })
-  direction: 'inbound' | 'outbound';
+  direction!: 'inbound' | 'outbound';
 
   @Column({ type: 'varchar', length: 50 })
-  status: 'ringing' | 'answered' | 'completed' | 'failed' | 'busy' | 'no_answer';
+  status!: 'ringing' | 'answered' | 'completed' | 'failed' | 'busy' | 'no_answer';
 
   @Column({ type: 'varchar', length: 20 })
-  fromNumber: string;
+  fromNumber!: string;
 
   @Column({ type: 'varchar', length: 20 })
-  toNumber: string;
+  toNumber!: string;
 
   @Column({ type: 'timestamptz' })
-  startTime: Date;
+  startTime!: Date;
 
   @Column({ type: 'timestamptz', nullable: true })
-  answerTime: Date;
+  answerTime!: Date;
 
   @Column({ type: 'timestamptz', nullable: true })
-  endTime: Date;
+  endTime!: Date;
 
   @Column({ type: 'integer', nullable: true })
-  durationSeconds: number;
+  durationSeconds!: number;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  sipTrunkId: string;
+  sipTrunkId!: string;
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: {
+  metadata!: {
     callerName?: string;
     callerLocation?: string;
     dialedNumber?: string;
@@ -50,16 +50,16 @@ export class Call extends TenantEntity {
   };
 
   @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
-  cost: number;
+  cost!: number;
 
   @Column({ type: 'varchar', length: 3, nullable: true })
-  currency: string;
+  currency!: string;
 
-  @OneToMany(() => CallRecording, (recording) => recording.call)
-  recordings: CallRecording[];
+  @OneToMany(() => CallRecording, (recording: CallRecording) => recording.call)
+  recordings!: CallRecording[];
 
-  @OneToMany(() => CallTranscript, (transcript) => transcript.call)
-  transcripts: CallTranscript[];
+  @OneToMany(() => CallTranscript, (transcript: CallTranscript) => transcript.call)
+  transcripts!: CallTranscript[];
 
   // Computed properties (not stored in DB)
   get isActive(): boolean {

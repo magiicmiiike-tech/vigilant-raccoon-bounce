@@ -8,19 +8,19 @@ import { ApiKey } from './ApiKey';
 @Index(['status', 'createdAt'])
 export class Tenant extends BaseEntity {
   @Column({ type: 'varchar', length: 100 })
-  name: string;
+  name!: string;
 
   @Column({ type: 'varchar', length: 255, unique: true })
-  domain: string;
+  domain!: string;
 
   @Column({ type: 'varchar', length: 50, default: 'starter' })
-  planTier: 'starter' | 'business' | 'enterprise';
+  planTier!: 'starter' | 'business' | 'enterprise';
 
   @Column({ type: 'varchar', length: 20, default: 'active' })
-  status: 'active' | 'suspended' | 'pending' | 'inactive';
+  status!: 'active' | 'suspended' | 'pending' | 'inactive';
 
   @Column({ type: 'jsonb', default: {} })
-  settings: {
+  settings!: {
     timezone?: string;
     locale?: string;
     currency?: string;
@@ -32,17 +32,17 @@ export class Tenant extends BaseEntity {
   };
 
   @Column({ type: 'timestamptz', nullable: true })
-  trialEndsAt: Date;
+  trialEndsAt!: Date;
 
   @Column({ type: 'timestamptz', nullable: true })
-  subscriptionEndsAt: Date;
+  subscriptionEndsAt!: Date;
 
-  @OneToOne(() => TenantConfig, (config) => config.tenant)
-  config: TenantConfig;
+  @OneToOne(() => TenantConfig, (config: TenantConfig) => config.tenant)
+  config!: TenantConfig;
 
-  @OneToMany(() => ApiKey, (apiKey) => apiKey.tenant)
-  apiKeys: ApiKey[];
+  @OneToMany(() => ApiKey, (apiKey: ApiKey) => apiKey.tenant)
+  apiKeys!: ApiKey[];
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 }

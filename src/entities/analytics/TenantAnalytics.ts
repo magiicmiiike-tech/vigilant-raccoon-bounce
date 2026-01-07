@@ -5,20 +5,20 @@ import { TenantEntity } from '../shared/BaseEntity';
 @Index(['tenantId', 'date'])
 export class TenantAnalytics extends TenantEntity {
   @Column({ type: 'date' })
-  date: Date;
+  date!: Date;
 
   @Column({ type: 'integer', default: 0 })
-  totalCalls: number;
+  totalCalls!: number;
 
   @Column({ type: 'integer', default: 0 })
-  totalMinutes: number;
+  totalMinutes!: number;
 
   @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
-  totalCost: number;
+  totalCost!: number;
 
   @Column({ type: 'jsonb', default: {} })
-  callStatusDistribution: Record<string, number>; // e.g., { 'completed': 100, 'failed': 5 }
+  callStatusDistribution!: Record<string, number>; // e.g., { 'completed': 100, 'failed': 5 }
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 }

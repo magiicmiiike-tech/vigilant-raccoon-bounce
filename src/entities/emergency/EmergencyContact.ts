@@ -5,23 +5,23 @@ import { TenantEntity } from '../shared/BaseEntity';
 @Index(['tenantId', 'userId'])
 export class EmergencyContact extends TenantEntity {
   @Column({ type: 'uuid' })
-  userId: string; // User who owns this contact
+  userId!: string; // User who owns this contact
 
   @Column({ type: 'varchar', length: 100 })
-  name: string;
+  name!: string;
 
   @Column({ type: 'varchar', length: 20 })
-  phoneNumber: string;
+  phoneNumber!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  email: string;
+  email!: string;
 
   @Column({ type: 'varchar', length: 50, default: 'primary' })
-  relationship: string; // e.g., 'primary', 'secondary', 'family'
+  relationship!: string; // e.g., 'primary', 'secondary', 'family'
 
   @Column({ type: 'boolean', default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 }

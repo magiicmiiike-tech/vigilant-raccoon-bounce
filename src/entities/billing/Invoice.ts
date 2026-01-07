@@ -8,38 +8,38 @@ import { InvoiceItem } from './InvoiceItem';
 @Index(['stripeInvoiceId'], { unique: true, where: 'deleted_at IS NULL' })
 export class Invoice extends TenantEntity {
   @Column({ type: 'uuid' })
-  subscriptionId: string;
+  subscriptionId!: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  stripeInvoiceId: string;
+  stripeInvoiceId!: string;
 
   @Column({ type: 'varchar', length: 50, default: 'draft' })
-  status: 'draft' | 'open' | 'paid' | 'void' | 'uncollectible';
+  status!: 'draft' | 'open' | 'paid' | 'void' | 'uncollectible';
 
   @Column({ type: 'timestamptz' })
-  invoiceDate: Date;
+  invoiceDate!: Date;
 
   @Column({ type: 'timestamptz', nullable: true })
-  dueDate: Date;
+  dueDate!: Date;
 
   @Column({ type: 'numeric', precision: 10, scale: 2 })
-  amountDue: number;
+  amountDue!: number;
 
   @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
-  amountPaid: number;
+  amountPaid!: number;
 
   @Column({ type: 'varchar', length: 3 })
-  currency: string;
+  currency!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  invoicePdfUrl: string;
+  invoicePdfUrl!: string;
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 
-  @ManyToOne(() => Subscription, (subscription) => subscription.invoices, { onDelete: 'CASCADE' })
-  subscription: Subscription;
+  @ManyToOne(() => Subscription, (subscription: Subscription) => subscription.invoices, { onDelete: 'CASCADE' })
+  subscription!: Subscription;
 
-  @OneToMany(() => InvoiceItem, (item) => item.invoice)
-  items: InvoiceItem[];
+  @OneToMany(() => InvoiceItem, (item: InvoiceItem) => item.invoice)
+  items!: InvoiceItem[];
 }

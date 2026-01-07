@@ -7,32 +7,32 @@ import { Tenant } from './Tenant';
 @Index(['tenantId', 'name'])
 export class ApiKey extends BaseEntity {
   @Column({ type: 'uuid' })
-  tenantId: string;
+  tenantId!: string;
 
   @Column({ type: 'varchar', length: 100 })
-  name: string;
+  name!: string;
 
   @Column({ type: 'varchar', length: 512 })
-  keyHash: string;
+  keyHash!: string;
 
   @Column({ type: 'varchar', length: 20, default: 'live' })
-  environment: 'live' | 'test' | 'development';
+  environment!: 'live' | 'test' | 'development';
 
   @Column({ type: 'jsonb', default: [] })
-  scopes: string[];
+  scopes!: string[];
 
   @Column({ type: 'timestamptz', nullable: true })
-  expiresAt: Date;
+  expiresAt!: Date;
 
   @Column({ type: 'timestamptz', nullable: true })
-  lastUsedAt: Date;
+  lastUsedAt!: Date;
 
   @Column({ type: 'varchar', length: 45, nullable: true })
-  lastUsedIp: string;
+  lastUsedIp!: string;
 
   @Column({ type: 'boolean', default: false })
-  isRevoked: boolean;
+  isRevoked!: boolean;
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.apiKeys, { onDelete: 'CASCADE' })
-  tenant: Tenant;
+  @ManyToOne(() => Tenant, (tenant: Tenant) => tenant.apiKeys, { onDelete: 'CASCADE' })
+  tenant!: Tenant;
 }

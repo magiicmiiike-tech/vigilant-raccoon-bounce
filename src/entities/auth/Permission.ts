@@ -5,11 +5,11 @@ import { Role } from './Role';
 @Entity('permissions')
 export class Permission extends BaseEntity {
   @Column({ type: 'varchar', length: 100, unique: true })
-  name: string;
+  name!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  description: string;
+  description!: string;
 
-  @ManyToMany(() => Role, (role) => role.permissions)
-  roles: Role[];
+  @ManyToMany(() => Role, (role: Role) => role.permissions)
+  roles!: Role[];
 }

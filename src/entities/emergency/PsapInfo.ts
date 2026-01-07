@@ -6,32 +6,32 @@ import { BaseEntity } from '../shared/BaseEntity';
 @Index(['state', 'city'])
 export class PsapInfo extends BaseEntity {
   @Column({ type: 'varchar', length: 100 })
-  name: string;
+  name!: string;
 
   @Column({ type: 'varchar', length: 20 })
-  phoneNumber: string;
+  phoneNumber!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  address: string;
+  address!: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  city: string;
+  city!: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  state: string;
+  state!: string;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
-  zipCode: string;
+  zipCode!: string;
 
   @Column({ type: 'numeric', precision: 9, scale: 6, nullable: true })
-  latitude: number;
+  latitude!: number;
 
   @Column({ type: 'numeric', precision: 9, scale: 6, nullable: true })
-  longitude: number;
+  longitude!: number;
 
   @Column({ type: 'jsonb', default: {} })
-  serviceArea: Record<string, any>; // GeoJSON or similar
+  serviceArea!: Record<string, any>; // GeoJSON or similar
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 }

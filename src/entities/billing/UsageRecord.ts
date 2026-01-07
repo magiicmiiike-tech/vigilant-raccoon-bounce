@@ -7,20 +7,20 @@ import { Subscription } from './Subscription';
 @Index(['tenantId', 'metricType', 'timestamp'])
 export class UsageRecord extends TenantEntity {
   @Column({ type: 'uuid' })
-  subscriptionId: string;
+  subscriptionId!: string;
 
   @Column({ type: 'varchar', length: 100 })
-  metricType: string; // e.g., 'call_minutes', 'api_requests', 'storage_gb'
+  metricType!: string; // e.g., 'call_minutes', 'api_requests', 'storage_gb'
 
   @Column({ type: 'numeric', precision: 10, scale: 4 })
-  amount: number;
+  amount!: number;
 
   @Column({ type: 'timestamptz' })
-  timestamp: Date;
+  timestamp!: Date;
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 
-  @ManyToOne(() => Subscription, (subscription) => subscription.usageRecords, { onDelete: 'CASCADE' })
-  subscription: Subscription;
+  @ManyToOne(() => Subscription, (subscription: Subscription) => subscription.usageRecords, { onDelete: 'CASCADE' })
+  subscription!: Subscription;
 }

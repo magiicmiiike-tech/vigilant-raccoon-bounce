@@ -6,16 +6,16 @@ import { Permission } from './Permission';
 @Entity('roles')
 export class Role extends BaseEntity {
   @Column({ type: 'varchar', length: 100, unique: true })
-  name: string;
+  name!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  description: string;
+  description!: string;
 
   @Column({ type: 'boolean', default: false })
-  isSystem: boolean;
+  isSystem!: boolean;
 
-  @OneToMany(() => User, (user) => user.role)
-  users: User[];
+  @OneToMany(() => User, (user: User) => user.role)
+  users!: User[];
 
   @ManyToMany(() => Permission)
   @JoinTable({
@@ -23,5 +23,5 @@ export class Role extends BaseEntity {
     joinColumn: { name: 'roleId', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'permissionId', referencedColumnName: 'id' },
   })
-  permissions: Permission[];
+  permissions!: Permission[];
 }

@@ -6,23 +6,23 @@ import { TenantEntity } from '../shared/BaseEntity';
 @Index(['callId', 'timestamp'])
 export class VoiceQualityLog extends TenantEntity {
   @Column({ type: 'uuid' })
-  callId: string;
+  callId!: string;
 
   @Column({ type: 'timestamptz' })
-  timestamp: Date;
+  timestamp!: Date;
 
   @Column({ type: 'numeric', precision: 5, scale: 2, nullable: true })
-  mosScore: number; // Mean Opinion Score
+  mosScore!: number; // Mean Opinion Score
 
   @Column({ type: 'numeric', precision: 5, scale: 2, nullable: true })
-  latencyMs: number;
+  latencyMs!: number;
 
   @Column({ type: 'numeric', precision: 5, scale: 2, nullable: true })
-  jitterMs: number;
+  jitterMs!: number;
 
   @Column({ type: 'numeric', precision: 5, scale: 2, nullable: true })
-  packetLoss: number; // Percentage
+  packetLoss!: number; // Percentage
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 }

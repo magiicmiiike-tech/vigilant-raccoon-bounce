@@ -5,10 +5,10 @@ import { Tenant } from './Tenant';
 @Entity('tenant_configs')
 export class TenantConfig extends BaseEntity {
   @Column({ type: 'uuid', unique: true })
-  tenantId: string;
+  tenantId!: string;
 
   @Column({ type: 'jsonb', default: {} })
-  voiceSettings: {
+  voiceSettings!: {
     defaultVoiceId?: string;
     speakingRate?: number;
     pitch?: number;
@@ -17,7 +17,7 @@ export class TenantConfig extends BaseEntity {
   };
 
   @Column({ type: 'jsonb', default: {} })
-  agentSettings: {
+  agentSettings!: {
     personality?: string;
     temperature?: number;
     maxTokens?: number;
@@ -26,7 +26,7 @@ export class TenantConfig extends BaseEntity {
   };
 
   @Column({ type: 'jsonb', default: {} })
-  telephonySettings: {
+  telephonySettings!: {
     defaultCountryCode?: string;
     callRecordingEnabled?: boolean;
     callTranscriptionEnabled?: boolean;
@@ -34,14 +34,14 @@ export class TenantConfig extends BaseEntity {
   };
 
   @Column({ type: 'jsonb', default: {} })
-  integrationSettings: {
+  integrationSettings!: {
     crmEnabled?: boolean;
     calendarEnabled?: boolean;
     webhookUrl?: string;
     webhookSecret?: string;
   };
 
-  @OneToOne(() => Tenant, (tenant) => tenant.config, { onDelete: 'CASCADE' })
+  @OneToOne(() => Tenant, (tenant: Tenant) => tenant.config, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'tenantId' })
-  tenant: Tenant;
+  tenant!: Tenant;
 }

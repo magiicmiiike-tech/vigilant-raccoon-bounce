@@ -7,26 +7,26 @@ import { User } from './User';
 @Index(['userId', 'expiresAt'])
 export class Session extends TenantEntity {
   @Column({ type: 'uuid' })
-  userId: string;
+  userId!: string;
 
   @Column({ type: 'varchar', length: 512 })
-  tokenHash: string;
+  tokenHash!: string;
 
   @Column({ type: 'timestamptz' })
-  expiresAt: Date;
+  expiresAt!: Date;
 
   @Column({ type: 'varchar', length: 45, nullable: true })
-  ipAddress: string;
+  ipAddress!: string;
 
   @Column({ type: 'text', nullable: true })
-  userAgent: string;
+  userAgent!: string;
 
   @Column({ type: 'jsonb', default: {} })
-  deviceInfo: Record<string, any>;
+  deviceInfo!: Record<string, any>;
 
   @Column({ type: 'boolean', default: false })
-  isRevoked: boolean;
+  isRevoked!: boolean;
 
-  @ManyToOne(() => User, (user) => user.sessions, { onDelete: 'CASCADE' })
-  user: User;
+  @ManyToOne(() => User, (user: User) => user.sessions, { onDelete: 'CASCADE' })
+  user!: User;
 }

@@ -6,38 +6,38 @@ import { TenantEntity } from '../shared/BaseEntity';
 @Index(['e911CallId'], { unique: true, where: 'deleted_at IS NULL' })
 export class EmergencyCall extends TenantEntity {
   @Column({ type: 'varchar', length: 100 })
-  e911CallId: string; // Unique ID from E911 provider
+  e911CallId!: string; // Unique ID from E911 provider
 
   @Column({ type: 'uuid', nullable: true })
-  originalCallId: string; // Reference to the call in telephony DB
+  originalCallId!: string; // Reference to the call in telephony DB
 
   @Column({ type: 'timestamptz' })
-  callTime: Date;
+  callTime!: Date;
 
   @Column({ type: 'varchar', length: 20 })
-  fromNumber: string;
+  fromNumber!: string;
 
   @Column({ type: 'varchar', length: 20 })
-  toNumber: string; // PSAP number
+  toNumber!: string; // PSAP number
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  callerName: string;
+  callerName!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  locationAddress: string;
+  locationAddress!: string;
 
   @Column({ type: 'numeric', precision: 9, scale: 6, nullable: true })
-  latitude: number;
+  latitude!: number;
 
   @Column({ type: 'numeric', precision: 9, scale: 6, nullable: true })
-  longitude: number;
+  longitude!: number;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
-  psapId: string; // Reference to PSAP info
+  psapId!: string; // Reference to PSAP info
 
   @Column({ type: 'varchar', length: 50, default: 'initiated' })
-  status: 'initiated' | 'routed' | 'answered' | 'completed' | 'failed';
+  status!: 'initiated' | 'routed' | 'answered' | 'completed' | 'failed';
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 }

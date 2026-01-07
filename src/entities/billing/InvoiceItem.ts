@@ -6,23 +6,23 @@ import { Invoice } from './Invoice';
 @Index(['invoiceId'])
 export class InvoiceItem extends BaseEntity {
   @Column({ type: 'uuid' })
-  invoiceId: string;
+  invoiceId!: string;
 
   @Column({ type: 'varchar', length: 255 })
-  description: string;
+  description!: string;
 
   @Column({ type: 'numeric', precision: 10, scale: 2 })
-  unitAmount: number;
+  unitAmount!: number;
 
   @Column({ type: 'integer' })
-  quantity: number;
+  quantity!: number;
 
   @Column({ type: 'numeric', precision: 10, scale: 2 })
-  totalAmount: number;
+  totalAmount!: number;
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 
-  @ManyToOne(() => Invoice, (invoice) => invoice.items, { onDelete: 'CASCADE' })
-  invoice: Invoice;
+  @ManyToOne(() => Invoice, (invoice: Invoice) => invoice.items, { onDelete: 'CASCADE' })
+  invoice!: Invoice;
 }

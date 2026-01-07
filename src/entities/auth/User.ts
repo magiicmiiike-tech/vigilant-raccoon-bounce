@@ -8,41 +8,41 @@ import { Permission } from './Permission'; // Assuming Permission entity exists
 @Index(['tenantId', 'email'], { unique: true, where: 'deleted_at IS NULL' })
 export class User extends TenantEntity {
   @Column({ type: 'varchar', length: 255, nullable: false })
-  email: string;
+  email!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
-  passwordHash: string;
+  passwordHash!: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  firstName: string;
+  firstName!: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  lastName: string;
+  lastName!: string;
 
   @Column({ type: 'boolean', default: false })
-  emailVerified: boolean;
+  emailVerified!: boolean;
 
   @Column({ type: 'boolean', default: false })
-  mfaEnabled: boolean;
+  mfaEnabled!: boolean;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  mfaSecret: string;
+  mfaSecret!: string;
 
   @Column({ type: 'timestamptz', nullable: true })
-  lastLoginAt: Date;
+  lastLoginAt!: Date;
 
   @Column({ type: 'varchar', length: 45, nullable: true })
-  lastLoginIp: string;
+  lastLoginIp!: string;
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 
-  @ManyToOne(() => Role, (role) => role.users)
-  role: Role;
+  @ManyToOne(() => Role, (role: Role) => role.users)
+  role!: Role;
 
-  @OneToMany(() => Session, (session) => session.user)
-  sessions: Session[];
+  @OneToMany(() => Session, (session: Session) => session.user)
+  sessions!: Session[];
 
   @Column({ type: 'varchar', length: 20, default: 'active' })
-  status: 'active' | 'suspended' | 'locked' | 'inactive';
+  status!: 'active' | 'suspended' | 'locked' | 'inactive';
 }
