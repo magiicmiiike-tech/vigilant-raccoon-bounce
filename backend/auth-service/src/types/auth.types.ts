@@ -1,3 +1,5 @@
+import { RoleType } from './db.types'; // Import RoleType from db.types.ts
+
 export interface RegisterRequest {
   email: string;
   password: string;
@@ -34,7 +36,7 @@ export interface UserResponse {
   firstName: string;
   lastName: string;
   phone?: string;
-  role: RoleType; // Changed from UserRole to RoleType
+  role: RoleType;
   tenantId: string;
   isActive: boolean;
   mfaEnabled: boolean;
@@ -49,20 +51,11 @@ export interface Tokens {
   expiresIn: number;
 }
 
-// Removed UserRole enum as it's replaced by RoleType from db.types.ts
-// export enum UserRole {
-//   SUPER_ADMIN = 'super_admin',
-//   TENANT_ADMIN = 'tenant_admin',
-//   USER = 'user',
-//   AGENT = 'agent',
-//   VIEWER = 'viewer',
-// }
-
 export interface JwtPayload {
   sub: string;
   email: string;
   tenantId: string;
-  role: RoleType; // Changed from UserRole to RoleType
+  role: RoleType;
   iat?: number;
   exp?: number;
 }

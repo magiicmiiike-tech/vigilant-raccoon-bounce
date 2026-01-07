@@ -3,7 +3,7 @@ import { TokenService } from '../src/services/TokenService';
 import { ValidationError } from '../src/utils/errors';
 import jwt from 'jsonwebtoken';
 import { RoleType } from '../src/types/db.types'; // Import RoleType
-import { DoneCallback } from '@types/jest'; // Import DoneCallback
+// import { DoneCallback } from '@types/jest'; // Removed explicit import, relying on global types
 
 describe('PasswordService Unit Tests', () => {
   describe('validateStrength', () => {
@@ -95,7 +95,7 @@ describe('TokenService Unit Tests', () => {
       expect(decoded.iat).toBeDefined();
     });
 
-    it('should reject expired tokens', (done: DoneCallback) => { // Explicitly typed done
+    it('should reject expired tokens', (done: jest.DoneCallback) => { // Explicitly typed done
       // Generate token with 1ms expiry
       const expiredToken = jwt.sign(
         testPayload,

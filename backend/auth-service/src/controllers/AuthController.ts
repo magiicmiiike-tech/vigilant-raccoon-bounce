@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { classToPlain } from 'class-transformer';
 import { AppDataSource } from '../data-source';
-import { Profile } from '../entities/Profile'; // Changed from User to Profile
-import { AppSession } from '../entities/AppSession'; // Changed from Session to AppSession
+import { Profile } from '../entities/Profile';
+import { AppSession } from '../entities/AppSession';
 import { PasswordResetToken } from '../entities/PasswordResetToken';
 import { LoginAttempt } from '../entities/LoginAttempt';
 import { 
@@ -19,8 +19,8 @@ import {
   PasswordResetRequest,
   PasswordResetConfirm,
   MfaVerifyRequest,
-  RoleType // Changed from UserRole to RoleType
 } from '../types/auth.types';
+import { RoleType } from '../types/db.types'; // Correctly import RoleType from db.types.ts
 import { 
   ValidationError, 
   AuthenticationError, 
@@ -31,7 +31,7 @@ import {
 import { logger } from '../utils/logger';
 
 export class AuthController {
-  private profileRepository = AppDataSource.getRepository(Profile); // Changed to profileRepository
+  private profileRepository = AppDataSource.getRepository(Profile);
   private passwordResetRepository = AppDataSource.getRepository(PasswordResetToken);
   private loginAttemptRepository = AppDataSource.getRepository(LoginAttempt);
   private sessionService = new SessionService();
@@ -49,49 +49,48 @@ export class AuthController {
       }
 
       // Check if profile already exists in tenant
-      const existingProfile = await this.profileRepository.findOne({ // Changed to profileRepository
+      const existingProfile = await this.profileRepository.findOne({
         where: { email: registerData.email, tenantId: registerData.tenantId },
       });
 
       if (existingProfile) {
-        throw new ConflictError('Profile with this email already exists in this tenant'); // Changed User to Profile
+        throw new ConflictError('Profile with this email already exists in this tenant');
       }
 
       // Create profile
       const hashedPassword = await PasswordService.hash(registerData.password);
       
-      const profile = this.profileRepository.create({ // Changed to profileRepository
+      const profile = this.profileRepository.create({
         email: registerData.email,
-        passwordHash: hashedPassword, // Changed password to passwordHash
+        passwordHash: hashedPassword,
         firstName: registerData.firstName,
         lastName: registerData.lastName,
         phone: registerData.phone,
         tenantId: registerData.tenantId,
         status: 'active', // Default status
-        // role: RoleType.USER, // Role assignment will be handled by profile_roles table
         metadata: registerData.metadata,
       });
 
-      await this.profileRepository.save(profile); // Changed to profileRepository
+      await this.profileRepository.save(profile);
 
       // Create initial session
       const { sessionId, refreshToken } = await this.sessionService.createSession(
-        profile.id, // Changed user.id to profile.id
-        profile.tenantId, // Added tenantId
+        profile.id,
+        profile.tenantId,
         req.get('user-agent'),
         req.ip,
         req.body.deviceInfo
       );
 
       const accessToken = TokenService.generateAccessToken({
-        sub: profile.id, // Changed user.id to profile.id
-        email: profile.email, // Changed user.email to profile.email
-        tenantId: profile.tenantId, // Changed user.tenantId to profile.tenantId
+        sub: profile.id,
+        email: profile.email,
+        tenantId: profile.tenantId,
         role: RoleType.USER, // Assuming default role for new registrations
       });
 
       const response: AuthResponse = {
-        user: classToPlain(profile) as any, // Changed user to profile
+        user: classToPlain(profile) as any,
         tokens: {
           accessToken,
           refreshToken,
@@ -100,10 +99,10 @@ export class AuthController {
       };
 
       // Remove sensitive data from response
-      delete (response.user as any).passwordHash; // Changed password to passwordHash
+      delete (response.user as any).passwordHash;
       delete (response.user as any).mfaSecret;
 
-      logger.info(`Profile registered: ${profile.email} in tenant ${profile.tenantId}`); // Changed User to Profile
+      logger.info(`Profile registered: ${profile.email} in tenant ${profile.tenantId}`);
 
       res.status(201).json(response);
     } catch (error) {
@@ -129,7 +128,7 @@ export class AuthController {
       }
 
       // Find profile
-      const profile = await this.profileRepository.findOne({ // Changed to profileRepository
+      const profile = await this.profileRepository.findOne({
         where: { email: loginData.email, tenantId: loginData.tenantId },
         relations: ['roles'], // Load roles to get the primary role
       });
@@ -148,55 +147,55 @@ export class AuthController {
       }
 
       // Check if account is locked
-      if (profile.isLocked()) { // Changed user to profile
+      if (profile.isLocked()) {
         throw new AuthenticationError('Account is temporarily locked. Try again later.');
       }
 
       // Verify password
-      const passwordValid = await PasswordService.compare(loginData.password, profile.passwordHash); // Changed user.password to profile.passwordHash
+      const passwordValid = await PasswordService.compare(loginData.password, profile.passwordHash);
       if (!passwordValid) {
-        profile.recordFailedAttempt(); // Changed user to profile
-        await this.profileRepository.save(profile); // Changed to profileRepository
+        profile.recordFailedAttempt();
+        await this.profileRepository.save(profile);
         throw new AuthenticationError('Invalid credentials');
       }
 
       // Reset failed attempts on successful login
-      profile.recordSuccessfulLogin(); // Changed user to profile
-      await this.profileRepository.save(profile); // Changed to profileRepository
+      profile.recordSuccessfulLogin();
+      await this.profileRepository.save(profile);
 
       // Determine the primary role for the JWT payload
-      const primaryRole = profile.roles?.[0]?.name || RoleType.USER; // Assuming the first role is the primary one
+      const primaryRole = profile.roles?.[0]?.name || RoleType.USER;
 
       // Check if MFA is required
-      if (profile.mfaEnabled) { // Changed user.mfaEnabled to profile.mfaEnabled
-        const mfaToken = TokenService.generateMFAToken(profile.id); // Changed user.id to profile.id
+      if (profile.mfaEnabled) {
+        const mfaToken = TokenService.generateMFAToken(profile.id);
         
         res.status(200).json({
           requiresMfa: true,
           mfaToken,
-          profileId: profile.id, // Changed userId to profileId
+          profileId: profile.id,
         });
         return;
       }
 
       // Create session
       const { sessionId, refreshToken } = await this.sessionService.createSession(
-        profile.id, // Changed user.id to profile.id
-        profile.tenantId, // Added tenantId
+        profile.id,
+        profile.tenantId,
         req.get('user-agent'),
         req.ip,
         loginData.deviceInfo
       );
 
       const accessToken = TokenService.generateAccessToken({
-        sub: profile.id, // Changed user.id to profile.id
-        email: profile.email, // Changed user.email to profile.email
-        tenantId: profile.tenantId, // Changed user.tenantId to profile.tenantId
-        role: primaryRole, // Use the determined primary role
+        sub: profile.id,
+        email: profile.email,
+        tenantId: profile.tenantId,
+        role: primaryRole,
       });
 
       const response: AuthResponse = {
-        user: classToPlain(profile) as any, // Changed user to profile
+        user: classToPlain(profile) as any,
         tokens: {
           accessToken,
           refreshToken,
@@ -205,10 +204,10 @@ export class AuthController {
       };
 
       // Remove sensitive data
-      delete (response.user as any).passwordHash; // Changed password to passwordHash
+      delete (response.user as any).passwordHash;
       delete (response.user as any).mfaSecret;
 
-      logger.info(`Profile logged in: ${profile.email} from ${req.ip}`); // Changed User to Profile
+      logger.info(`Profile logged in: ${profile.email} from ${req.ip}`);
 
       res.status(200).json(response);
     } catch (error) {
@@ -223,7 +222,7 @@ export class AuthController {
         await this.sessionService.invalidateSession(sessionId);
       }
 
-      logger.info(`Profile logged out: ${req.user?.email}`); // Changed User to Profile
+      logger.info(`Profile logged out: ${req.user?.email}`);
 
       res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
@@ -240,9 +239,9 @@ export class AuthController {
       }
 
       // Find session by refresh token
-      const session = await AppDataSource.getRepository(AppSession).findOne({ // Changed Session to AppSession
-        where: { refreshTokenHash: refreshToken, status: 'active' }, // Changed refreshToken to refreshTokenHash
-        relations: ['profile', 'profile.roles'], // Load profile and its roles
+      const session = await AppDataSource.getRepository(AppSession).findOne({
+        where: { refreshTokenHash: refreshToken, status: 'active' },
+        relations: ['profile', 'profile.roles'],
       });
 
       if (!session) {
@@ -256,19 +255,19 @@ export class AuthController {
 
       // Generate new tokens
       const newRefreshToken = TokenService.generateRefreshToken();
-      const primaryRole = session.profile.roles?.[0]?.name || RoleType.USER; // Get primary role from profile
+      const primaryRole = session.profile.roles?.[0]?.name || RoleType.USER;
 
       const accessToken = TokenService.generateAccessToken({
-        sub: session.profile.id, // Changed session.user.id to session.profile.id
-        email: session.profile.email, // Changed session.user.email to session.profile.email
-        tenantId: session.profile.tenantId, // Changed session.user.tenantId to session.profile.tenantId
-        role: primaryRole, // Use the determined primary role
+        sub: session.profile.id,
+        email: session.profile.email,
+        tenantId: session.profile.tenantId,
+        role: primaryRole,
       });
 
       // Update session with new refresh token
-      session.refreshTokenHash = newRefreshToken; // Changed refreshToken to refreshTokenHash
-      session.updateLastUsed(); // Changed updateLastActive to updateLastUsed
-      await AppDataSource.getRepository(AppSession).save(session); // Changed Session to AppSession
+      session.refreshTokenHash = newRefreshToken;
+      session.updateLastUsed();
+      await AppDataSource.getRepository(AppSession).save(session);
 
       res.status(200).json({
         accessToken,
@@ -284,8 +283,8 @@ export class AuthController {
     try {
       const { email, tenantId }: PasswordResetRequest = req.body;
 
-      const profile = await this.profileRepository.findOne({ // Changed to profileRepository
-        where: { email, tenantId, status: 'active' }, // Changed isActive to status: 'active'
+      const profile = await this.profileRepository.findOne({
+        where: { email, tenantId, status: 'active' },
       });
 
       if (!profile) {
@@ -303,7 +302,7 @@ export class AuthController {
 
       const resetToken = this.passwordResetRepository.create({
         token,
-        profileId: profile.id, // Changed userId to profileId
+        profileId: profile.id,
         expiresAt,
       });
 
@@ -336,7 +335,7 @@ export class AuthController {
       // Find reset token
       const resetToken = await this.passwordResetRepository.findOne({
         where: { token },
-        relations: ['profile'], // Changed user to profile
+        relations: ['profile'],
       });
 
       if (!resetToken || !resetToken.isValid()) {
@@ -344,24 +343,24 @@ export class AuthController {
       }
 
       // Ensure profile belongs to the correct tenant
-      if (resetToken.profile.tenantId !== tenantId) { // Changed resetToken.user.tenantId to resetToken.profile.tenantId
+      if (resetToken.profile.tenantId !== tenantId) {
         throw new AuthenticationError('Invalid tenant');
       }
 
       // Update password
       const hashedPassword = await PasswordService.hash(password);
-      resetToken.profile.passwordHash = hashedPassword; // Changed resetToken.user.password to resetToken.profile.passwordHash
-      resetToken.profile.passwordChangedAt = new Date(); // Update password changed at
-      await this.profileRepository.save(resetToken.profile); // Changed userRepository to profileRepository
+      resetToken.profile.passwordHash = hashedPassword;
+      resetToken.profile.passwordChangedAt = new Date();
+      await this.profileRepository.save(resetToken.profile);
 
       // Mark token as used
       resetToken.markAsUsed();
       await this.passwordResetRepository.save(resetToken);
 
       // Invalidate all existing sessions
-      await this.sessionService.invalidateAllProfileSessions(resetToken.profile.id); // Changed invalidateAllUserSessions to invalidateAllProfileSessions
+      await this.sessionService.invalidateAllProfileSessions(resetToken.profile.id);
 
-      logger.info(`Password reset for profile: ${resetToken.profile.email}`); // Changed user to profile
+      logger.info(`Password reset for profile: ${resetToken.profile.email}`);
 
       res.status(200).json({ message: 'Password reset successfully' });
     } catch (error) {
@@ -371,8 +370,8 @@ export class AuthController {
 
   async setupMfa(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const profileId = req.user!.sub; // Changed userId to profileId
-      const result = await this.mfaService.setupMfa(profileId); // Changed userId to profileId
+      const profileId = req.user!.sub;
+      const result = await this.mfaService.setupMfa(profileId);
       
       res.status(200).json(result);
     } catch (error) {
@@ -397,29 +396,29 @@ export class AuthController {
       }
 
       // Get profile and create session
-      const profile = await this.profileRepository.findOne({ where: { id: payload.sub } }); // Changed user to profile
+      const profile = await this.profileRepository.findOne({ where: { id: payload.sub } });
       if (!profile) {
-        throw new NotFoundError('Profile'); // Changed User to Profile
+        throw new NotFoundError('Profile');
       }
 
       const { sessionId, refreshToken } = await this.sessionService.createSession(
-        profile.id, // Changed user.id to profile.id
-        profile.tenantId, // Added tenantId
+        profile.id,
+        profile.tenantId,
         req.get('user-agent'),
         req.ip
       );
 
-      const primaryRole = profile.roles?.[0]?.name || RoleType.USER; // Get primary role from profile
+      const primaryRole = profile.roles?.[0]?.name || RoleType.USER;
 
       const accessToken = TokenService.generateAccessToken({
-        sub: profile.id, // Changed user.id to profile.id
-        email: profile.email, // Changed user.email to profile.email
-        tenantId: profile.tenantId, // Changed user.tenantId to profile.tenantId
-        role: primaryRole, // Use the determined primary role
+        sub: profile.id,
+        email: profile.email,
+        tenantId: profile.tenantId,
+        role: primaryRole,
       });
 
       const response: AuthResponse = {
-        user: classToPlain(profile) as any, // Changed user to profile
+        user: classToPlain(profile) as any,
         tokens: {
           accessToken,
           refreshToken,
@@ -427,7 +426,7 @@ export class AuthController {
         },
       };
 
-      delete (response.user as any).passwordHash; // Changed password to passwordHash
+      delete (response.user as any).passwordHash;
       delete (response.user as any).mfaSecret;
 
       res.status(200).json(response);
@@ -438,8 +437,8 @@ export class AuthController {
 
   async disableMfa(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const profileId = req.user!.sub; // Changed userId to profileId
-      await this.mfaService.disableMfa(profileId); // Changed userId to profileId
+      const profileId = req.user!.sub;
+      await this.mfaService.disableMfa(profileId);
       
       res.status(200).json({ message: 'MFA disabled successfully' });
     } catch (error) {
@@ -449,17 +448,17 @@ export class AuthController {
 
   async getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const profile = await this.profileRepository.findOne({ // Changed to profileRepository
+      const profile = await this.profileRepository.findOne({
         where: { id: req.user!.sub },
-        relations: ['roles'], // Load roles for the profile
+        relations: ['roles'],
       });
 
       if (!profile) {
-        throw new NotFoundError('Profile'); // Changed User to Profile
+        throw new NotFoundError('Profile');
       }
 
       const response = classToPlain(profile) as any;
-      delete response.passwordHash; // Changed password to passwordHash
+      delete response.passwordHash;
       delete response.mfaSecret;
 
       res.status(200).json(response);
@@ -471,11 +470,11 @@ export class AuthController {
   async createApiKey(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { name, scopes, expiresInDays } = req.body;
-      const profileId = req.user!.sub; // Changed userId to profileId
+      const profileId = req.user!.sub;
       const tenantId = req.user!.tenantId;
 
       const result = await this.apiKeyService.createApiKey(
-        profileId, // Changed userId to profileId
+        profileId,
         tenantId,
         name,
         scopes,
@@ -497,8 +496,8 @@ export class AuthController {
 
   async getApiKeys(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const profileId = req.user!.sub; // Changed userId to profileId
-      const apiKeys = await this.apiKeyService.getProfileApiKeys(profileId); // Changed getUserApiKeys to getProfileApiKeys
+      const profileId = req.user!.sub;
+      const apiKeys = await this.apiKeyService.getProfileApiKeys(profileId);
       
       res.status(200).json(apiKeys);
     } catch (error) {
@@ -509,9 +508,9 @@ export class AuthController {
   async revokeApiKey(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      const profileId = req.user!.sub; // Changed userId to profileId
+      const profileId = req.user!.sub;
       
-      await this.apiKeyService.revokeApiKey(id, profileId); // Changed userId to profileId
+      await this.apiKeyService.revokeApiKey(id, profileId);
       
       res.status(200).json({ message: 'API key revoked successfully' });
     } catch (error) {

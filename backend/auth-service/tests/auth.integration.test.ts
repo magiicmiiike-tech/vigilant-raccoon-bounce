@@ -2,7 +2,7 @@ import request from 'supertest';
 import { createApp } from '../src/app';
 import { AppDataSource } from '../src/data-source';
 import { Profile } from '../src/entities/Profile'; // Changed from User to Profile
-import { Application } from 'express';
+import type { Application } from 'express'; // Import Application type
 
 describe('Auth Service Integration Tests', () => {
   let app: Application;
