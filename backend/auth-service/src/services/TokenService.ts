@@ -23,7 +23,7 @@ export class TokenService {
         issuer: 'dukat-auth-service',
         audience: 'dukat-voice',
       }) as JwtPayload;
-    } catch (error) {
+    } catch (error: any) { // Fixed: Cast error to any
       if (error.name === 'TokenExpiredError') {
         throw new AuthenticationError('Access token expired');
       }
@@ -56,7 +56,7 @@ export class TokenService {
         issuer: 'dukat-auth-service',
         audience: 'dukat-voice-api',
       }) as ApiKeyPayload;
-    } catch (error) {
+    } catch (error: any) { // Fixed: Cast error to any
       throw new AuthorizationError('Invalid API key');
     }
   }
@@ -76,7 +76,7 @@ export class TokenService {
   static verifyMFAToken(token: string): { sub: string } {
     try {
       return jwt.verify(token, config.jwt.accessSecret) as { sub: string };
-    } catch (error) {
+    } catch (error: any) { // Fixed: Cast error to any
       throw new AuthenticationError('Invalid MFA token');
     }
   }

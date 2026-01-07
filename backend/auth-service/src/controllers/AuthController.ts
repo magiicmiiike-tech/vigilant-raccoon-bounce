@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { classToPlain } from 'class-transformer';
 import { AppDataSource } from '../data-source';
 import { User } from '../entities/User';
+import { Session } from '../entities/Session'; // Fixed: Imported Session entity
 import { PasswordResetToken } from '../entities/PasswordResetToken';
 import { LoginAttempt } from '../entities/LoginAttempt';
 import { 

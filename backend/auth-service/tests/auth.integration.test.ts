@@ -2,9 +2,10 @@ import request from 'supertest';
 import { createApp } from '../src/app';
 import { AppDataSource } from '../src/data-source';
 import { User } from '../src/entities/User';
+import { Application } from 'express'; // Fixed: Imported Application from express
 
 describe('Auth Service Integration Tests', () => {
-  let app: Express.Application;
+  let app: Application; // Fixed: Changed type to Application
   let testUser: User;
   let testTenantId = 'test-tenant-123';
 

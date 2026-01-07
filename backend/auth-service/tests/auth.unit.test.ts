@@ -2,6 +2,7 @@ import { PasswordService } from '../src/services/PasswordService';
 import { TokenService } from '../src/services/TokenService';
 import { ValidationError } from '../src/utils/errors';
 import jwt from 'jsonwebtoken'; // Import jwt for testing expired tokens
+import type { DoneCallback } from '@jest/types/build/Global'; // Fixed: Imported DoneCallback
 
 describe('PasswordService Unit Tests', () => {
   describe('validateStrength', () => {
@@ -73,7 +74,10 @@ describe('TokenService Unit Tests', () => {
 
   describe('generateAccessToken', () => {
     it('should generate a valid JWT', () => {
-      const token = TokenService.generateAccessToken(testPayload);
+      const token = TokenService.generateAccessToken({
+        ...testPayload,
+        role: testPayload.role as any, // Fixed: Cast role to any for test payload compatibility
+      });
       
       expect(typeof token).toBe('string');
       expect(token.split('.')).toHaveLength(3); // JWT has 3 parts
@@ -82,7 +86,10 @@ describe('TokenService Unit Tests', () => {
 
   describe('verifyAccessToken', () => {
     it('should verify valid tokens', () => {
-      const token = TokenService.generateAccessToken(testPayload);
+      const token = TokenService.generateAccessToken({
+        ...testPayload,
+        role: testPayload.role as any, // Fixed: Cast role to any
+      });
       const decoded = TokenService.verifyAccessToken(token);
       
       expect(decoded.sub).toBe(testPayload.sub);
@@ -93,10 +100,10 @@ describe('TokenService Unit Tests', () => {
       expect(decoded.iat).toBeDefined();
     });
 
-    it('should reject expired tokens', (done: jest.DoneCallback) => { // Use done for async test
+    it('should reject expired tokens', (done: DoneCallback) => { // Fixed: Used DoneCallback
       // Generate token with 1ms expiry
       const expiredToken = jwt.sign(
-        testPayload,
+        { ...testPayload, role: testPayload.role as any }, // Fixed: Cast role to any
         'test-secret', // Use a consistent secret for testing
         { expiresIn: '1ms' }
       );
