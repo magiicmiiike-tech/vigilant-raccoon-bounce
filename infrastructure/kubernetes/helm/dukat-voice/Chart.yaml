@@ -1,0 +1,9 @@
+apiVersion: v2
+name: dukat-voice
+description: Voice AI SaaS
+version: 1.0.0
+dependencies:
+  - name: livekit
+    version: 1.5.0
+  - name: kamailio
+    version: 5.7.0

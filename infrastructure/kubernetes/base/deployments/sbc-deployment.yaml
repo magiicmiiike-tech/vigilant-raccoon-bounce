@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sbc
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: kamailio
+        image: kamailio:5.7

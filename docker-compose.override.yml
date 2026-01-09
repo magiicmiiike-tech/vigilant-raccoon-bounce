@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dukat_voice
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.multi-stage
+      target: agent
+    volumes:
+      - ./agent:/app/agent
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/dukat_voice
+      - REDIS_URL=redis://redis:6379
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.multi-stage
+      target: web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+
+volumes:
+  pgdata:

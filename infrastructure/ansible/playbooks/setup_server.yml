@@ -1,0 +1,6 @@
+- name: Setup Server
+  hosts: all
+  become: yes
+  roles:
+    - common
+    - docker

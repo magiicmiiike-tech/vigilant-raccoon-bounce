@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   webpack: (config: WebpackConfig) => { // Explicitly type config parameter
     if (process.env.NODE_ENV === 'development') {
       config.watchOptions = {
-        ignore: /node_modules/,
+        ignored: /node_modules/,
       }
     }
     return config

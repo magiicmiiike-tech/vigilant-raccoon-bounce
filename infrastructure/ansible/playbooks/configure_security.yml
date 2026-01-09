@@ -1,0 +1,5 @@
+- name: Configure Security
+  hosts: all
+  become: yes
+  roles:
+    - common  # Includes security hardening

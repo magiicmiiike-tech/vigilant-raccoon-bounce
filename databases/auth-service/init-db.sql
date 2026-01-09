@@ -1,0 +1,5 @@
+-- init-db.sql (DEPRECATED)
+-- Renamed to init-db.postgres.sql to avoid MS SQL analyzer errors in editors.
+-- Please use init-db.postgres.sql for PostgreSQL-specific initialization.
+-- (Left intentionally minimal to avoid running psql meta-commands in generic runners.)
+--CREATE DATABASE auth;

@@ -1,0 +1,1 @@
+output "zone_id" { value = aws_route53_zone.dukat_zone.id }

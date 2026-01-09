@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telephony
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telephony
+  template:
+    metadata:
+      labels:
+        app: telephony
+    spec:
+      containers:
+      - name: telephony
+        image: dukat/telephony:latest
+        ports:
+          - containerPort: 5060

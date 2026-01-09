@@ -1,0 +1,6 @@
+- name: Disaster Recovery
+  hosts: all
+  become: yes
+  tasks:
+    - name: Restore from backup
+      command: psql -U user dbname < backup.sql

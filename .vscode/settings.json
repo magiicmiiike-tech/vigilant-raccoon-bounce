@@ -1,4 +1,10 @@
 {
+  "files.associations": {
+    "init-db.sql": "postgresql",
+    "unity_catalog.sql": "sql",
+    "*.databricks.sql": "sql"
+  },
+  "sql.language": "postgresql",
   "npm.packageManager": "pnpm",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[typescript]": {

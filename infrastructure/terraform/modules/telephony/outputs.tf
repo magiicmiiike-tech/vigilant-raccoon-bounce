@@ -1,0 +1,1 @@
+output "voice_connector_id" { value = aws_chime_voice_connector.telephony.id }

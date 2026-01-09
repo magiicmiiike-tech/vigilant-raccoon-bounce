@@ -1,0 +1,2 @@
+rtpengine:
+  replicas: 2

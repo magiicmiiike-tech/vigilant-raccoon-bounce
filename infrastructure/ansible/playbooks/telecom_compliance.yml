@@ -1,0 +1,5 @@
+- name: Telecom Compliance
+  hosts: all
+  become: yes
+  roles:
+    - common  # STIR/SHAKEN certs

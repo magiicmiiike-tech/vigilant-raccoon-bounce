@@ -1,0 +1,41 @@
+# Multi-stage Dockerfile to build Python agent and Node services
+
+# ------- Builder: Python deps & agent -------
+FROM python:3.12-slim AS python-builder
+WORKDIR /app
+ENV PYTHONUNBUFFERED=1
+COPY requirements.txt requirements-dev.txt ./
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install pip-tools==6.14.0 && \
+    pip install -r requirements.txt
+
+# Copy app sources
+COPY agent/ ./agent/
+COPY security/ ./security/
+COPY business/ ./business/
+
+# ------- Builder: Node (Next.js) -------
+FROM node:20-alpine AS node-builder
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile
+COPY . .
+RUN pnpm -w -r build
+
+# ------- Runtime image (Python agent) -------
+FROM python:3.12-slim AS agent
+WORKDIR /app
+COPY --from=python-builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=python-builder /app/agent ./agent
+ENV PATH="/root/.local/bin:$PATH"
+EXPOSE 8000
+CMD ["python", "-m", "agent.agent"]
+
+# ------- Runtime image (Web) -------
+FROM node:20-alpine AS web
+WORKDIR /app
+COPY --from=node-builder /app/.next .next
+COPY --from=node-builder /app/public public
+COPY --from=node-builder /app/package.json package.json
+EXPOSE 3000
+CMD ["pnpm", "start"]

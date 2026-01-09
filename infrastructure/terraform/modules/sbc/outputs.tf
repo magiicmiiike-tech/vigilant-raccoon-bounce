@@ -1,0 +1,1 @@
+output "sbc_ip" { value = aws_ec2_instance.sbc.public_ip }

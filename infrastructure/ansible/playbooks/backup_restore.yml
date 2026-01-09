@@ -1,0 +1,6 @@
+- name: Backup and Restore
+  hosts: all
+  become: yes
+  tasks:
+    - name: Backup database
+      command: pg_dump -U user dbname > backup.sql

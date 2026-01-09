@@ -1,0 +1,84 @@
+video:
+  # Codec configuration
+  codecs:
+    preferred: "VP8"
+    fallback: "H264"
+    backup: "VP9"
+  
+  # Resolution and quality
+  resolutions:
+    low: "320x240"
+    medium: "640x480"
+    high: "1280x720"
+    ultra: "1920x1080"
+  
+  # Bitrate settings (kbps)
+  bitrates:
+    low: 150
+    medium: 500
+    high: 1500
+    ultra: 3000
+  
+  # Frame rates
+  frame_rates:
+    default: 30
+    minimum: 15
+    maximum: 60
+  
+  # Screen sharing
+  screen_sharing:
+    enabled: true
+    max_fps: 10
+    max_bitrate: 2000
+    preferred_codec: "VP8"
+    
+  # AI video processing
+  ai_processing:
+    enabled: true
+    face_detection: true
+    emotion_analysis: true
+    attention_tracking: true
+    lip_reading: false  # Experimental
+    ocr_enabled: true
+    
+  # Quality adaptation
+  adaptation:
+    enabled: true
+    algorithm: "google congestion control"
+    min_bitrate: 100
+    max_bitrate: 5000
+    degradation_preference: "maintain-framerate"
+    
+  # Simulcast (multiple quality layers)
+  simulcast:
+    enabled: true
+    layers: 3
+    scalability_mode: "L3T3"
+    
+  # SVC (Scalable Video Coding)
+  svc:
+    enabled: false
+    scalability_mode: "L3T3_KEY"
+    
+  # Network optimization
+  network:
+    nack: true
+    pli: true
+    fir: true
+    transport_cc: true
+    goog_remb: true
+    
+  # Hardware acceleration
+  hardware_acceleration:
+    enabled: true
+    preferred_encoder: "nvidia"
+    fallback_encoder: "software"
+    
+  # Recording settings
+  recording:
+    enabled: true
+    format: "webm"
+    codec: "VP8"
+    audio_track: true
+    video_track: true
+    max_duration: 3600  # seconds

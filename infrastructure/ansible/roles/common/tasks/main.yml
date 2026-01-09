@@ -1,0 +1,16 @@
+- name: Update packages
+  apt:
+    update_cache: yes
+
+- name: Install common packages
+  apt:
+    name:
+      - curl
+      - vim
+      - ufw
+    state: present
+
+- name: Hard Hustle OS
+  ufw:
+    state: enabled
+    policy: deny

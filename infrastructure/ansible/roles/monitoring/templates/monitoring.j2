@@ -1,0 +1,6 @@
+# alert rules
+groups:
+- name: telephony
+  rules:
+  - alert: HighPacketLoss
+    expr: rtp_packet_loss > 5

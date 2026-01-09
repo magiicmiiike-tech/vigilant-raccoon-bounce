@@ -1,0 +1,8 @@
+replicaCount: 1
+image:
+  repository: dukat/voice
+  tag: latest
+sbc:
+  enabled: true
+emergency:
+  enabled: true

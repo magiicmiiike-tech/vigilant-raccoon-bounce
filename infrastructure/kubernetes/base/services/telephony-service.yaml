@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: telephony
+spec:
+  selector:
+    app: telephony
+  ports:
+    - protocol: UDP
+      port: 5060
+      targetPort: 5060
+  type: LoadBalancer

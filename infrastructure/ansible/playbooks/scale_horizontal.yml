@@ -1,0 +1,6 @@
+- name: Horizontal Scaling
+  hosts: all
+  become: yes
+  tasks:
+    - name: Add nodes
+      command: kubectl scale deployment telephony --replicas=5

@@ -1,0 +1,6 @@
+- name: Deploy Telephony
+  hosts: prod_servers
+  become: yes
+  roles:
+    - sbc
+    - monitoring

@@ -3,10 +3,10 @@ name: DB migrations & tests
 on:
   push:
     paths:
-      - 'SESSION_01_DATABASE_SCHEMA/**'
+      - 'databases/**'
   pull_request:
     paths:
-      - 'SESSION_01_DATABASE_SCHEMA/**'
+      - 'databases/**'
 
 jobs:
   migrations-and-tests:
@@ -45,34 +45,34 @@ jobs:
       - name: Setup pnpm
         run: corepack prepare pnpm@latest --activate
 
-      - name: Install dependencies (SESSION_01_DATABASE_SCHEMA)
-        working-directory: SESSION_01_DATABASE_SCHEMA
+      - name: Install dependencies
+        working-directory: databases
         run: pnpm install --frozen-lockfile
 
       - name: Wait for Postgres
-        working-directory: SESSION_01_DATABASE_SCHEMA
+        working-directory: databases
         run: pnpm run ci:wait-db
 
       - name: Create database
-        working-directory: SESSION_01_DATABASE_SCHEMA
+        working-directory: databases
         env:
           DB_NAME: dukat_voice
         run: pnpm run ci:create-db
 
       - name: Run migrations
-        working-directory: SESSION_01_DATABASE_SCHEMA
+        working-directory: databases
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/dukat_voice
         run: pnpm run migration:run
 
       - name: Run database seeds
-        working-directory: SESSION_01_DATABASE_SCHEMA
+        working-directory: databases
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/dukat_voice
         run: pnpm run seed:run
 
       - name: Run integration tests
-        working-directory: SESSION_01_DATABASE_SCHEMA
+        working-directory: databases
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/dukat_voice
         run: pnpm run test:integration
