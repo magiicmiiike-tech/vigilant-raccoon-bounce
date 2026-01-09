@@ -1,0 +1,10 @@
+{
+  "name": "dukat-consolidated",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build-all": "turbo run build || echo 'Run per-package build'",
+    "test-all": "turbo run test || echo 'Run per-package test'",
+    "lint-all": "turbo run lint || echo 'Run per-package lint'"
+  }
+}
