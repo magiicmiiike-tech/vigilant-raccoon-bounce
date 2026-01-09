@@ -1,0 +1,225 @@
+version: '3.8'
+
+services:
+  # Existing services
+  postgres:
+    image: postgres:15-alpine
+    container_name: dukat-postgres
+    environment:
+      POSTGRES_USER: dukat
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dukat
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - dukat-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dukat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: dukat-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --requirepass password
+    networks:
+      - dukat-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  consul:
+    image: consul:1.15
+    container_name: dukat-consul
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    command: agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0
+    networks:
+      - dukat-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: dukat-jaeger
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+    networks:
+      - dukat-network
+
+  # New services from Session 04
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: dukat-livekit
+    ports:
+      - "7880:7880"   # WebSocket
+      - "7881:7881"   # HTTP
+      - "7882:7882"   # TURN TCP
+      - "7883:7883"   # TURN UDP
+      - "50051:50051" # gRPC
+      - "9090:9090"   # Prometheus
+    environment:
+      - LIVEKIT_KEYS=devkey:devsecret
+      - LIVEKIT_PORT=7880
+      - LIVEKIT_BIND_ADDRESSES=0.0.0.0
+      - LIVEKIT_RTC_UDP_PORT=7882
+      - LIVEKIT_RTC_TCP_PORT=7883
+      - LIVEKIT_REDIS_ADDR=redis:6379
+      - LIVEKIT_REDIS_PASSWORD=password
+      - LIVEKIT_TURN_ENABLED=true
+      - LIVEKIT_TURN_EXTERNAL_TLS=false
+      - LIVEKIT_PROMETHEUS_ENABLED=true
+      - LIVEKIT_PROMETHEUS_PORT=9090
+    volumes:
+      - ../config/livekit.yaml:/livekit.yaml
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - dukat-network
+    restart: unless-stopped
+
+  voice-service:
+    build:
+      context: ../backend/voice-service
+      dockerfile: Dockerfile
+    container_name: dukat-voice-service
+    ports:
+      - "3012:3012"
+    environment:
+      - NODE_ENV=development
+      - PORT=3012
+      - LIVEKIT_API_KEY=devkey
+      - LIVEKIT_API_SECRET=devsecret
+      - LIVEKIT_URL=ws://livekit:7880
+      - LIVEKIT_HTTP_URL=http://livekit:7881
+      - DATABASE_URL=postgresql://dukat:password@postgres:5432/telephony
+      - REDIS_URL=redis://:password@redis:6379
+      - JWT_SECRET=voice-service-secret
+      - API_GATEWAY_URL=http://api-gateway:3000
+      - CORS_ORIGIN=http://localhost:3000
+    depends_on:
+      - postgres
+      - redis
+      - livekit
+    networks:
+      - dukat-network
+    restart: unless-stopped
+
+  voice-agent:
+    build:
+      context: ../agent
+      dockerfile: Dockerfile
+    container_name: dukat-voice-agent
+    ports:
+      - "8000:8000"
+    environment:
+      - LIVEKIT_URL=ws://livekit:7880
+      - LIVEKIT_API_KEY=devkey
+      - LIVEKIT_API_SECRET=devsecret
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY:-}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - DATABASE_URL=postgresql://dukat:password@postgres:5432/telephony
+      - REDIS_URL=redis://:password@redis:6379
+      - AGENT_NAME=DukatVoiceAgent
+      - HOST=0.0.0.0
+      - PORT=8000
+      - LOG_LEVEL=INFO
+    volumes:
+      - ../agent/logs:/app/logs
+    depends_on:
+      - postgres
+      - redis
+      - livekit
+      - voice-service
+    networks:
+      - dukat-network
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: ../backend/api-gateway
+      dockerfile: Dockerfile
+    container_name: dukat-api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - AUTH_SERVICE_URL=http://auth-service:3010
+      - TENANT_SERVICE_URL=http://tenant-service:3011
+      - VOICE_SERVICE_URL=http://voice-service:3012
+      - REDIS_URL=redis://:password@redis:6379
+      - CONSUL_URL=http://consul:8500
+    depends_on:
+      - auth-service
+      - tenant-service
+      # - voice-service (circular dependency if not careful, but okay here)
+      - consul
+    networks:
+      - dukat-network
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: ../backend/auth-service
+      dockerfile: Dockerfile
+    container_name: dukat-auth-service
+    ports:
+      - "3010:3010"
+    environment:
+      - NODE_ENV=development
+      - PORT=3010
+      - DATABASE_URL=postgresql://dukat:password@postgres:5432/auth
+      - REDIS_URL=redis://:password@redis:6379
+      - JWT_SECRET_KEY=auth-service-secret
+      - JWT_REFRESH_SECRET=auth-refresh-secret
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - dukat-network
+    restart: unless-stopped
+
+  tenant-service:
+    build:
+      context: ../backend/tenant-service
+      dockerfile: Dockerfile
+    container_name: dukat-tenant-service
+    ports:
+      - "3011:3011"
+    environment:
+      - NODE_ENV=development
+      - PORT=3011
+      - DATABASE_URL=postgresql://dukat:password@postgres:5432/tenants
+      - REDIS_URL=redis://:password@redis:6379
+      - CONSUL_URL=http://consul:8500
+    depends_on:
+      - postgres
+      - redis
+      - consul
+    networks:
+      - dukat-network
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  dukat-network:
+    driver: bridge

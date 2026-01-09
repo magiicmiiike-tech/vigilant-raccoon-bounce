@@ -1,0 +1,8 @@
+livekit>=0.9.0
+python-dotenv>=1.0.0
+aiohttp>=3.8.5
+google-api-python-client>=2.92.0
+openai>=0.27.8
+deepgram-sdk>=2.12.0
+elevenlabs>=0.2.24
+redis>=4.6.0

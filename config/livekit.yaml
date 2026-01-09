@@ -1,0 +1,25 @@
+rtc:
+  udp_port: 7882
+  tcp_port: 7883
+  port_range_start: 50000
+  port_range_end: 60000
+  use_external_ip: false
+
+redis:
+  address: localhost:6379
+  username: ""
+  password: ""
+
+turn:
+  enabled: true
+  domain: localhost
+  tls_port: 7883
+  udp_port: 7883
+  external_tls: false
+
+keys:
+  devkey: devsecret
+
+logging:
+  level: info
+  json: false

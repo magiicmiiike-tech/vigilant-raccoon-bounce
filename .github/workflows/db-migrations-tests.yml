@@ -1,0 +1,78 @@
+name: DB migrations & tests
+
+on:
+  push:
+    paths:
+      - 'SESSION_01_DATABASE_SCHEMA/**'
+  pull_request:
+    paths:
+      - 'SESSION_01_DATABASE_SCHEMA/**'
+
+jobs:
+  migrations-and-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: timescale/timescaledb:pg15-latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd 'pg_isready -U postgres'
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: dukat_voice
+      PGSSLMODE: disable
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        run: corepack prepare pnpm@latest --activate
+
+      - name: Install dependencies (SESSION_01_DATABASE_SCHEMA)
+        working-directory: SESSION_01_DATABASE_SCHEMA
+        run: pnpm install --frozen-lockfile
+
+      - name: Wait for Postgres
+        working-directory: SESSION_01_DATABASE_SCHEMA
+        run: pnpm run ci:wait-db
+
+      - name: Create database
+        working-directory: SESSION_01_DATABASE_SCHEMA
+        env:
+          DB_NAME: dukat_voice
+        run: pnpm run ci:create-db
+
+      - name: Run migrations
+        working-directory: SESSION_01_DATABASE_SCHEMA
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dukat_voice
+        run: pnpm run migration:run
+
+      - name: Run database seeds
+        working-directory: SESSION_01_DATABASE_SCHEMA
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dukat_voice
+        run: pnpm run seed:run
+
+      - name: Run integration tests
+        working-directory: SESSION_01_DATABASE_SCHEMA
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/dukat_voice
+        run: pnpm run test:integration

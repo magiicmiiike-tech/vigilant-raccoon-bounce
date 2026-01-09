@@ -1,0 +1,25 @@
+{
+  "name": "billing-service",
+  "version": "1.0.0",
+  "description": "Billing service for Dukat Voice SaaS",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "stripe": "^14.0.0",
+    "typeorm": "^0.3.17",
+    "pg": "^8.11.3",
+    "dotenv": "^16.3.1",
+    "@dukat/shared": "file:../../backend/shared"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.20",
+    "@types/node": "^20.8.10",
+    "typescript": "^5.2.2",
+    "ts-node-dev": "^2.0.0"
+  }
+}

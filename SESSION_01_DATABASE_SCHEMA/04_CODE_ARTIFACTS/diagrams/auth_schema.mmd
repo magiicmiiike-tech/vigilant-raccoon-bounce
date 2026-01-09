@@ -1,0 +1,36 @@
+erDiagram
+    USERS {
+        uuid id PK
+        uuid tenant_id
+        string email
+        string password_hash
+        uuid role_id FK
+        boolean is_active
+        timestamp created_at
+    }
+    ROLES {
+        uuid id PK
+        uuid tenant_id
+        string name
+        string description
+    }
+    PERMISSIONS {
+        uuid id PK
+        string slug
+        string scope
+    }
+    SESSIONS {
+        uuid id PK
+        uuid user_id FK
+        string token
+        timestamp expires_at
+    }
+    ROLE_PERMISSIONS {
+        uuid role_id FK
+        uuid permission_id FK
+    }
+
+    USERS ||--o{ SESSIONS : has
+    ROLES ||--|{ USERS : assigned_to
+    ROLES ||--|{ ROLE_PERMISSIONS : has
+    PERMISSIONS ||--|{ ROLE_PERMISSIONS : granted_in

@@ -14,6 +14,8 @@
     "seed:run": "ts-node scripts/seed-database.ts",
     "validate:schema": "ts-node scripts/validate-schema.ts",
     "test:integration": "ts-node scripts/test-integration.ts",
+    "ci:wait-db": "node scripts/wait-for-db.js",
+    "ci:create-db": "node scripts/create-db.js",
     "generate-diagrams": "mmdc -i diagrams/full_er_diagram.mmd -o diagrams/full_er_diagram.png"
   },
   "dependencies": {

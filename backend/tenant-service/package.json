@@ -1,0 +1,30 @@
+{
+  "name": "tenant-service",
+  "version": "1.0.0",
+  "description": "Tenant management service for Dukat Voice SaaS",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "typeorm": "typeorm-ts-node-commonjs"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "typeorm": "^0.3.17",
+    "pg": "^8.11.3",
+    "reflect-metadata": "^0.1.13",
+    "dotenv": "^16.3.1",
+    "winston": "^3.11.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "@dukat/shared": "file:../shared"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.20",
+    "@types/node": "^20.8.10",
+    "@types/cors": "^2.8.15",
+    "typescript": "^5.2.2",
+    "ts-node-dev": "^2.0.0"
+  }
+}
